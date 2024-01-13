@@ -1,0 +1,389 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Поиск жилья
+  contact:
+    name: ITAcademy
+    url: http://it-academy.by
+
+servers:
+  - url: http://{host}:{port}
+    description: custom server
+    variables:
+      host:
+        description: host name
+        default: localhost
+      port:
+        description: port value
+        default: "80"
+
+tags:
+  - name: "Отчёты"
+    description: "Построение отчётов"
+
+paths:
+  /api/v1/report/{type}:
+    post:
+      tags:
+        - "Отчёты"
+      summary: "Добавление нового отчёта"
+      parameters:
+        - in: path
+          name: type
+          description: "Тип отчёта"
+          required: true
+          schema:
+            $ref: '#/components/schemas/ReportType'
+      requestBody:
+        $ref: "#/components/requestBodies/CreateReport"
+      responses:
+        '201':
+          description: Отчёт запущен
+        '400':
+          $ref: '#/components/responses/Bad_Request'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/Internal_Server_Error'
+  /api/v1/report:
+    get:
+      tags:
+        - "Отчёты"
+      summary: "Получить страницу отчётов"
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Номер страницы
+          required: false
+        - in: query
+          name: size
+          schema:
+            type: integer
+            minimum: 1
+            default: 20
+          description: Размер страницы
+          required: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageOfReport'
+        '400':
+          $ref: '#/components/responses/Bad_Request'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/Internal_Server_Error'
+  /api/v1/report/{uuid}/export:
+    get:
+      tags:
+        - "Отчёты"
+      summary: Скачать сформированный отчёт
+      parameters:
+        - in: path
+          name: uuid
+          description: Идентификатор отчёта
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+                description: Файл Excel XLSX
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+                description: Описание файла
+                example: 'attachment; filename="f43b1a97-dc00-40e2-9450-ace8d2416f3d.xlsx"'
+            Content-Type:
+              schema:
+                type: string
+                description: Описание типа контента
+                example: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        '204':
+          description: Сервер, по предоставленному uuid, не смог найти информацию
+        '400':
+          $ref: '#/components/responses/Bad_Request'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/Internal_Server_Error'
+    head:
+      tags:
+        - "Отчёты"
+      summary: Проверка доступности сформированного отчёта
+      parameters:
+        - in: path
+          name: uuid
+          description: Идентификатор отчёта
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        '200':
+          description: OK
+        '204':
+          description: Сервер, по предоставленному uuid, не смог найти информацию
+        '400':
+          $ref: '#/components/responses/Bad_Request'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/Internal_Server_Error'
+
+
+components:
+  requestBodies:
+    CreateReport:
+      description: Параметры для создания отчёта
+      required: true
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/UserActionAuditParam'
+
+  responses:
+    Bad_Request:
+      description: Запрос некорректен. Сервер не может обработать запрос
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - type: array
+                items:
+                  $ref: '#/components/schemas/t_error_response'
+              - $ref: '#/components/schemas/t_structured_error_response'
+          examples:
+            t_error_response:
+              value:
+                - logref: error
+                  message:  Запрос содержит некорректные данные. Измените запрос и отправьте его ещё раз
+            t_structured_error_response:
+              value:
+                logref: structured_error
+                errors:
+                  - field: time_unit
+                    message: Поле должно быть положительным числом
+    Unauthorized:
+      description: Для выполнения запроса на данный адрес требуется передать токен авторизации
+    Forbidden:
+      description: Данному токенту авторизации запрещено выполнять запроса на данный адрес
+    Internal_Server_Error:
+      description: Внутренняя ошибка сервера. Сервер не смог корректно обработать запрос
+      content:
+        applicaion/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/t_error_response'
+          example:
+            - logref: error
+              message:  Сервер не смог корректно обработать запрос. Пожалуйста обратитесь к администратору
+  schemas:
+    Report:
+      type: object
+      description: Отчёт
+      required:
+        - description
+      allOf:
+        - $ref: '#/components/schemas/t_base_essence'
+      properties:
+        status:
+          type: string
+          description: |
+            Статус отчёта:
+              * `LOADED` - Ожидает формирования
+              * `PROGRESS` - Формирует
+              * `ERROR` - Ошибка формирование
+              * `DONE` - Сформирован
+          enum:
+            - LOADED
+            - PROGRESS
+            - ERROR
+            - DONE
+        type:
+          $ref: '#/components/schemas/ReportType'
+        description:
+          type: string
+          description: "Описание параметров отчёта в человеческом формате"
+          readOnly: true
+          example: "Журнал аудита за: 01.01.2021 - 01.01.2022"
+        params:
+          oneOf:
+            - $ref: '#/components/schemas/UserActionAuditParam'
+
+    ReportType:
+      type: string
+      description: |
+        Тип отчёта:
+          * `JOURNAL_AUDIT` - Отчёт по действиям в системе
+      enum:
+        - JOURNAL_AUDIT
+
+    UserActionAuditParam:
+      type: object
+      description: Параметры запуска отчёта о действиях пользователя
+      properties:
+        user:
+          description: Действия выполненные пользователями
+          type: array
+          items:
+            type: string
+            format: uuid
+        from:
+          description: Записи из журнала начиная с даты
+          type: string
+          format: date
+          example: "01.01.2021"
+        to:
+          description: Записи из журнала заканчивая датой
+          type: string
+          format: date
+          example: "01.01.2022"
+
+
+    PageOfReport:
+      type: object
+      description: Отчёты
+      allOf:
+        - $ref: '#/components/schemas/t_page'
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Report'
+
+    t_base_essence:
+      type: object
+      description: Описание базовой сущности.
+      required:
+        - uuid
+        - dt_create
+        - dt_update
+      properties:
+        uuid:
+          description: Уникальный идентификатор сущности
+          type: string
+          format: uuid
+          readOnly: true
+        dt_create:
+          description: Дата создания сущности (linux time)
+          type: number
+          format: int64
+          readOnly: true
+        dt_update:
+          description: Дата последнего обновления сущности (linux time)
+          type: integer
+          format: int64
+          readOnly: true
+
+    t_page:
+      type: object
+      required:
+        - number
+        - size
+        - total_pages
+        - total_elements
+        - content
+        - first
+        - number_of_elements
+        - last
+      description: Страница
+      properties:
+        number:
+          description: Номер текущей запрошенной страницы
+          type: integer
+          format: int32
+        size:
+          description: Запрошенное количество элементов на страницу
+          type: integer
+          format: int32
+        total_pages:
+          description: Всего количество страниц учитывающих запрашиваемое количество элементов на страницу
+          type: integer
+          format: int32
+        total_elements:
+          description: Всего количество записей соответствующих запросу
+          type: integer
+          format: int64
+        first:
+          description: Признак является ли страница первой
+          type: boolean
+        number_of_elements:
+          description: Количество элементов на текущей странице
+          type: integer
+          format: int32
+        last:
+          description: Признак является ли страница последней
+          type: boolean
+
+    t_error_response:
+      type: object
+      description: Ошибка. Содержит общее описание ошибки
+      required:
+        - logref
+        - message
+      properties:
+        logref:
+          type: string
+          description: |
+            Тип ошибки (предназначено для машинной обработки):
+              * `error` - Признак что ошибка не привязана к полю
+          enum:
+            - "error"
+        message:
+          description: Сообщение об ошибке
+          type: string
+          example: Запрос содержит некорректные данные. Измените запрос и отправьте его ещё раз
+
+    t_structured_error_response:
+      type: object
+      description: Ошибка. Содержит описание ошибок с отсылками на поля сущности
+      required:
+        - logref
+        - errors
+      properties:
+        logref:
+          type: string
+          description: |
+            Тип ошибки (предназначено для машинной обработки):
+              * `structured_error` - Признак что ошибка привязана к полю
+          enum:
+            - "structured_error"
+        errors:
+          description: Список ошибок
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+                description: Сообщение об ошибке
+                example: Должно быть положительным числом
+              field:
+                type: string
+                description: Наименование поля с которым связано сообщение
+                example: time_unit

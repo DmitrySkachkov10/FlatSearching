@@ -1,0 +1,489 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Поиск жилья
+  contact:
+    name: ITAcademy
+    url: http://it-academy.by
+
+servers:
+  - url: http://{host}:{port}
+    description: custom server
+    variables:
+      host:
+        description: host name
+        default: localhost
+      port:
+        description: port value
+        default: "80"
+
+tags:
+  - name: "Пользователи"
+    description: "Информация о пользователях системы"
+  - name: "Личный кабинет"
+    description: "Доступ к личному кабинету"
+
+paths:
+  /api/v1/users:
+    post:
+      tags:
+        - "Пользователи"
+      summary: "Добавление нового пользователя"
+      security:
+        - bearerAuth: [ADMIN]
+      requestBody:
+        $ref: "#/components/requestBodies/CreateUser"
+      responses:
+        '201':
+          description: "Пользователь добавлен"
+        '400':
+          $ref: '#/components/responses/Bad_Request'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/Internal_Server_Error'
+    get:
+      tags:
+        - "Пользователи"
+      summary: "Получить страницу пользователей"
+      security:
+        - bearerAuth: [ADMIN]
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Номер страницы
+          required: false
+        - in: query
+          name: size
+          schema:
+            type: integer
+            minimum: 1
+            default: 20
+          description: Размер страницы
+          required: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageOfUser'
+        '400':
+          $ref: '#/components/responses/Bad_Request'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/Internal_Server_Error'
+  /api/v1/users/{uuid}:
+    get:
+      tags:
+        - "Пользователи"
+      summary: "Получить информацию о пользователе"
+      security:
+        - bearerAuth: [ADMIN]
+      parameters:
+        - in: path
+          name: uuid
+          description: "Идентификатор пользователя"
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/Bad_Request'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/Internal_Server_Error'
+  /api/v1/users/{uuid}/dt_update/{dt_update}:
+    put:
+      tags:
+        - "Пользователи"
+      summary: "Редактировать информацию о пользователе"
+      security:
+        - bearerAuth: [ADMIN]
+      parameters:
+        - in: path
+          name: uuid
+          description: "Идентификатор пользователя"
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: dt_update
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: "Дата последнего обновления записи"
+      requestBody:
+        $ref: "#/components/requestBodies/CreateUser"
+      responses:
+        '200':
+          description: "Пользователь обновлён"
+        '400':
+          $ref: '#/components/responses/Bad_Request'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/Internal_Server_Error'
+  /api/v1/users/registration:
+    post:
+      tags:
+        - "Личный кабинет"
+      summary: "Самостоятельная регистрация пользователя"
+      requestBody:
+        $ref: "#/components/requestBodies/RegistrationUser"
+      responses:
+        '201':
+          description: "Пользователь зарегистрирован"
+        '400':
+          $ref: '#/components/responses/Bad_Request'
+        '500':
+          $ref: '#/components/responses/Internal_Server_Error'
+  /api/v1/users/verification:
+    get:
+      tags:
+        - "Личный кабинет"
+      summary: "Верификация самостоятельного зарегистрированного пользователя"
+      parameters:
+        - in: query
+          name: code
+          schema:
+            type: string
+          description: Код верификации подтверждающий доступ к почтовому адресу
+          required: true
+        - in: query
+          name: mail
+          schema:
+            type: string
+          description: Электронная почта для которой был выдан код верификации
+          required: true
+      responses:
+        '200':
+          description: "Пользователь верифицирован"
+        '400':
+          $ref: '#/components/responses/Bad_Request'
+        '500':
+          $ref: '#/components/responses/Internal_Server_Error'
+  /api/v1/users/login:
+    post:
+      tags:
+        - "Личный кабинет"
+      summary: "Вход"
+      requestBody:
+        $ref: "#/components/requestBodies/LoginUser"
+      responses:
+        '200':
+          description: "Вход выполнен. Токен для Authorization Header"
+          content:
+            application/jwt:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/Bad_Request'
+        '500':
+          $ref: '#/components/responses/Internal_Server_Error'
+  /api/v1/users/me:
+    get:
+      tags:
+        - "Личный кабинет"
+      summary: "Получить информацию о себе"
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/Bad_Request'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/Internal_Server_Error'
+components:
+  requestBodies:
+    CreateUser:
+      description: Тело для создания Пользователя
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserCreate'
+    RegistrationUser:
+      description: Тело для регистрации пользователя
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserRegistration'
+    LoginUser:
+      description: Тело для входа
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserLogin'
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    Bad_Request:
+      description: Запрос некорректен. Сервер не может обработать запрос
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - type: array
+                items:
+                  $ref: '#/components/schemas/t_error_response'
+              - $ref: '#/components/schemas/t_structured_error_response'
+          examples:
+            t_error_response:
+              value:
+                - logref: error
+                  message:  Запрос содержит некорректные данные. Измените запрос и отправьте его ещё раз
+            t_structured_error_response:
+              value:
+                logref: structured_error
+                errors:
+                  - field: time_unit
+                    message: Поле должно быть положительным числом
+    Unauthorized:
+      description: Для выполнения запроса на данный адрес требуется передать токен авторизации
+    Forbidden:
+      description: Данному токену авторизации запрещено выполнять запроса на данный адрес
+    Internal_Server_Error:
+      description: Внутренняя ошибка сервера. Сервер не смог корректно обработать запрос
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/t_error_response'
+          example:
+            - logref: error
+              message:  Сервер не смог корректно обработать запрос. Пожалуйста обратитесь к администратору
+  schemas:
+    UserRole:
+      type: string
+      description: |
+        Роль пользователя:
+          * `ADMIN` - Администратор
+          * `USER` - Пользователь
+          * `MANAGER` - Менеджер
+      enum:
+        - "ADMIN"
+        - "USER"
+        - "MANAGER"
+    UserStatus:
+      type: string
+      description: |
+        Статус пользователя:
+          * `WAITING_ACTIVATION` - Ожидает активации
+          * `ACTIVATED` - Активирован
+          * `DEACTIVATED` - Деактивирован
+      enum:
+        - "WAITING_ACTIVATION"
+        - "ACTIVATED"
+        - "DEACTIVATED"
+    User:
+      type: object
+      description: Пользователь
+      allOf:
+        - $ref: '#/components/schemas/t_base_essence'
+      properties:
+        mail:
+          type: string
+          description: "Электронная почта"
+        fio:
+          type: string
+          description: "ФИО"
+        role:
+          $ref: '#/components/schemas/UserRole'
+        status:
+          $ref: '#/components/schemas/UserStatus'
+    UserCreate:
+      type: object
+      description: Пользователь
+      allOf:
+        - $ref: '#/components/schemas/User'
+      properties:
+        password:
+          type: string
+          description: "Пароль"
+    UserRegistration:
+      type: object
+      description: Пользователь
+      properties:
+        mail:
+          type: string
+          description: "Электронная почта"
+        fio:
+          type: string
+          description: "ФИО"
+        password:
+          type: string
+          description: "Пароль"
+    UserLogin:
+      type: object
+      description: Пользователь
+      properties:
+        mail:
+          type: string
+          description: "Электронная почта"
+        password:
+          type: string
+          description: "Пароль"
+
+    PageOfUser:
+      type: object
+      description: Страница пользователей
+      allOf:
+        - $ref: '#/components/schemas/t_page'
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+
+    t_base_essence:
+      type: object
+      description: Описание базовой сущности.
+      required:
+        - uuid
+        - dt_create
+        - dt_update
+      properties:
+        uuid:
+          description: Уникальный идентификатор сущности
+          type: string
+          format: uuid
+          readOnly: true
+        dt_create:
+          description: Дата создания сущности (linux time)
+          type: number
+          format: int64
+          readOnly: true
+        dt_update:
+          description: Дата последнего обновления сущности (linux time)
+          type: integer
+          format: int64
+          readOnly: true
+
+    t_page:
+      type: object
+      required:
+        - number
+        - size
+        - total_pages
+        - total_elements
+        - content
+        - first
+        - number_of_elements
+        - last
+      description: Страница
+      properties:
+        number:
+          description: Номер текущей запрошенной страницы
+          type: integer
+          format: int32
+        size:
+          description: Запрошенное количество элементов на страницу
+          type: integer
+          format: int32
+        total_pages:
+          description: Всего количество страниц учитывающих запрашиваемое количество элементов на страницу
+          type: integer
+          format: int32
+        total_elements:
+          description: Всего количество записей соответствующих запросу
+          type: integer
+          format: int64
+        first:
+          description: Признак является ли страница первой
+          type: boolean
+        number_of_elements:
+          description: Количество элементов на текущей странице
+          type: integer
+          format: int32
+        last:
+          description: Признак является ли страница последней
+          type: boolean
+
+    t_error_response:
+      type: object
+      description: Ошибка. Содержит общее описание ошибки
+      required:
+        - logref
+        - message
+      properties:
+        logref:
+          type: string
+          description: |
+            Тип ошибки (предназначено для машинной обработки):
+              * `error` - Признак что ошибка не привязана к полю
+          enum:
+            - "error"
+        message:
+          description: Сообщение об ошибке
+          type: string
+          example: Запрос содержит некорректные данные. Измените запрос и отправьте его ещё раз
+
+    t_structured_error_response:
+      type: object
+      description: Ошибка. Содержит описание ошибок с отсылками на поля сущности
+      required:
+        - logref
+        - errors
+      properties:
+        logref:
+          type: string
+          description: |
+            Тип ошибки (предназначено для машинной обработки):
+              * `structured_error` - Признак что ошибка привязана к полю
+          enum:
+            - "structured_error"
+        errors:
+          description: Список ошибок
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+                description: Сообщение об ошибке
+                example: Должно быть положительным числом
+              field:
+                type: string
+                description: Наименование поля с которым связано сообщение
+                example: time_unit

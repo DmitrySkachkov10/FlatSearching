@@ -1,0 +1,9 @@
+spring:
+  profiles:
+    active:
+      - local
+  application:
+    name: mailing-service
+server:
+  port: 9091
+

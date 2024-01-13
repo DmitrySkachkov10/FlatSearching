@@ -1,0 +1,64 @@
+version: '3.5'
+services:
+  db:
+    build: postgresql:latest
+    image: flats_postgresql:1.0.0
+    restart: always
+    environment:
+      POSTGRES_DB: flat_searching
+      POSTGRES_USER: dmitry
+      POSTGRES_PASSWORD: dmitry
+    networks:
+      - flats_ntwrk
+  pgadmin:
+    build: pgadmin
+    image: flats_pgadmin:1.0.0
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: dmitry
+    ports:
+      - "82:80"
+    networks:
+      - flats_ntwrk
+  swagger-ui:
+    build: swagger-ui
+    image: flats_swagger-ui:1.0.6
+    ports:
+      - "81:8080"
+    networks:
+      - flats_ntwrk
+
+  user-service:
+    build: user-service
+    image: flats_user-service:1.0.17
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db/flat_searching
+    ports:
+      - "9099:9099"
+    depends_on:
+      - db
+      - mailing-service
+    networks:
+      - flats_ntwrk
+
+  mailing-service:
+    build: mailing-service
+    image: flats_mailing-service:1.0.5
+    ports:
+      - "83"
+    networks:
+      - flats_ntwrk
+
+  proxy:
+    build: proxy
+    image: flats_proxy:1.0.8
+    ports:
+      - "80:80"
+    networks:
+      - flats_ntwrk
+
+networks:
+  flats_ntwrk:
+    name: flats_ntwrk
+    driver: bridge

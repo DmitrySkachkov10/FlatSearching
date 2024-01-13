@@ -1,0 +1,17 @@
+package by.skachkovdmitry.personal_account.service.api;
+
+import by.skachkovdmitry.personal_account.core.dto.User;
+import by.skachkovdmitry.personal_account.core.dto.UserLogin;
+import by.skachkovdmitry.personal_account.core.dto.UserRegistration;
+import by.skachkovdmitry.personal_account.core.dto.verification.MailVerifyDTO;
+import by.skachkovdmitry.personal_account.core.status.Status;
+
+public interface IAuthenticationService {
+    boolean logIn(UserLogin userLogin);
+
+    void register(UserRegistration userRegistration) ;
+
+    User myInfo();
+
+    void verify(MailVerifyDTO mailVerifyDTO);
+}

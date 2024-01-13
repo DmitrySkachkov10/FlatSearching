@@ -1,0 +1,3 @@
+# Project exclude paths
+/audit-service
+.idea

@@ -54,6 +54,7 @@ public class SecurityConfig{
                 .requestMatchers("/user/verification").permitAll()
                 .requestMatchers("/user/login").permitAll()
                 .requestMatchers("/user/me").authenticated()
+                .requestMatchers("/user").hasRole("ADMIN")
                 // ... other rules ...
                 .anyRequest().authenticated()
         );

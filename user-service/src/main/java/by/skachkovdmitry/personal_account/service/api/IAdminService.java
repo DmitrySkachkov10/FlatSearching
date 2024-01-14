@@ -1,5 +1,6 @@
 package by.skachkovdmitry.personal_account.service.api;
 
+import by.skachkovdmitry.personal_account.core.dto.PageOfUser;
 import by.skachkovdmitry.personal_account.core.dto.User;
 import by.skachkovdmitry.personal_account.core.dto.UserCreate;
 
@@ -10,7 +11,7 @@ public interface IAdminService {
 
     User getUser(String uuid);
 
-    List<User> getUserList();
+    PageOfUser getUserList(int page, int size);
 
     void update(User user);
 }

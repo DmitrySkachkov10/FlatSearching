@@ -27,7 +27,6 @@ public class User implements GrantedAuthority {
     private String role;
     private String status;
 
-
     public User() {
     }
 
@@ -99,6 +98,7 @@ public class User implements GrantedAuthority {
 
 
     @Override
+    @JsonIgnore
     public String getAuthority() {
         return "ROLE_" + role;
     }

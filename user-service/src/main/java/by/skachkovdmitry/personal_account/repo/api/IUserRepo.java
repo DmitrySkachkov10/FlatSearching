@@ -4,6 +4,7 @@ import by.skachkovdmitry.personal_account.core.status.Status;
 import by.skachkovdmitry.personal_account.repo.entity.UserEntity;
 import feign.Param;
 import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -11,7 +12,7 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.Optional;
 
 
-public interface IUserRepo extends CrudRepository<UserEntity, String> {
+public interface IUserRepo extends JpaRepository<UserEntity, String> {
     Optional<UserEntity> findByMailAndPassword(String mail, String password);
 
     Optional<UserEntity> findByMail(String mail);

@@ -1,10 +1,7 @@
 package by.skachkovdmitry.personal_account.service;
 
 
-import by.skachkovdmitry.personal_account.core.dto.User;
-import by.skachkovdmitry.personal_account.core.dto.UserCreate;
-import by.skachkovdmitry.personal_account.core.dto.UserLogin;
-import by.skachkovdmitry.personal_account.core.dto.UserRegistration;
+import by.skachkovdmitry.personal_account.core.dto.*;
 import by.skachkovdmitry.personal_account.core.exception.*;
 import by.skachkovdmitry.personal_account.core.role.Roles;
 import by.skachkovdmitry.personal_account.core.status.Status;
@@ -12,9 +9,12 @@ import by.skachkovdmitry.personal_account.repo.api.IUserRepo;
 import by.skachkovdmitry.personal_account.repo.entity.UserEntity;
 import by.skachkovdmitry.personal_account.service.api.IUserService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -123,5 +123,32 @@ public class UserService implements IUserService {
     @Transactional
     public void updateUserStatus(String mail, Status status) {
         userRepo.updateStatusByEmail(mail, status);
+    }
+
+    @Override
+    public PageOfUser getUsers(Pageable pageable) {
+        Page<UserEntity> userEntities = userRepo.findAll(pageable);
+
+        List<User> users = userEntities.stream().map(userEntity -> new User(userEntity.getUuid(),
+                        userEntity.getDtCreate(),
+                        userEntity.getDtUpdate(),
+                        userEntity.getFio(),
+                        userEntity.getMail(),
+                        userEntity.getRole().toString(),
+                        userEntity.getStatus().toString()))
+                .toList();
+
+        PageOfUser pageOfUser = new  PageOfUser(userEntities.getNumber(),
+                userEntities.getSize(),
+                userEntities.getTotalPages(),
+                userEntities.getTotalElements(),
+                userEntities.isFirst(),
+                userEntities.getNumberOfElements(),
+                userEntities.isLast(),
+                users);
+
+        pageOfUser.getUserList().forEach(System.out::println);
+
+        return pageOfUser;
     }
 }

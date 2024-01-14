@@ -2,6 +2,7 @@ package by.skachkovdmitry.personal_account.service;
 
 
 import by.skachkovdmitry.personal_account.core.dto.User;
+import by.skachkovdmitry.personal_account.core.dto.UserCreate;
 import by.skachkovdmitry.personal_account.core.dto.UserLogin;
 import by.skachkovdmitry.personal_account.core.dto.UserRegistration;
 import by.skachkovdmitry.personal_account.core.exception.*;
@@ -54,7 +55,7 @@ public class UserService implements IUserService {
         UserEntity userEntity = new UserEntity();
         userEntity.setUuid(UUID.randomUUID().toString());
         userEntity.setDtCreate(LocalDateTime.now());
-        userEntity.setDtCreate(LocalDateTime.now());
+        userEntity.setDtUpdate(userEntity.getDtCreate());
         userEntity.setMail(userRegistration.getMail());
         userEntity.setPassword(userRegistration.getPassword());
         userEntity.setFio(userRegistration.getFio());
@@ -74,6 +75,33 @@ public class UserService implements IUserService {
             throw new DatabaseError("Проблема в системе обратитеь к администратору");
         }
 
+    }
+
+
+    @Override
+    public void save(UserCreate userCreate) {
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setUuid(UUID.randomUUID().toString());
+        userEntity.setDtCreate(LocalDateTime.now());
+        userEntity.setDtUpdate(LocalDateTime.now());
+        userEntity.setMail(userCreate.getMail());
+        userEntity.setPassword(userCreate.getPassword());
+        userEntity.setFio(userCreate.getFio());
+        userEntity.setRole(Roles.valueOf(userCreate.getRole()));
+        userEntity.setStatus(Status.valueOf(userCreate.getStatus()));
+
+        if (userRepo.findByMail(userCreate.getMail()).isPresent()) {
+            Errors<ValidationError> validationErrors = new Errors<>();
+            ValidationError validationError = new ValidationError("Пользователь с такой почтой уже зарегистрирован", "email");
+            validationErrors.add(validationError);
+            throw new StructuredError(validationErrors);
+        }
+        try {
+            userRepo.save(userEntity);
+        } catch (Exception e) {
+            throw new DatabaseError("Проблема в системе обратитеь к администратору");
+        }
     }
 
     @Override

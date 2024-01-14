@@ -4,6 +4,7 @@ import by.skachkovdmitry.personal_account.core.dto.UserCreate;
 import by.skachkovdmitry.personal_account.service.api.IAdminService;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,8 +19,12 @@ public class AdminController {
         this.adminService = adminService;
     }
 
+    @PostMapping
     public ResponseEntity<String> create(@RequestBody UserCreate userCreate) {
         adminService.create(userCreate);
         return new ResponseEntity<>("Пользователь создан", HttpStatusCode.valueOf(200));
     }
+
+
+
 }

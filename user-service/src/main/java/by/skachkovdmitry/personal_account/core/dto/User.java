@@ -6,8 +6,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
@@ -105,7 +107,8 @@ public class User implements GrantedAuthority {
 
     @JsonIgnore //чтобы не было круговой завиимости у jackson
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(this);
+        return Arrays.asList(new SimpleGrantedAuthority("ROLE_" + role));
     }
+
 
 }

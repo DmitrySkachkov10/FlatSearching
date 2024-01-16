@@ -24,15 +24,12 @@ public class UserController {
     }
 
     @PostMapping("/registration")
-
     public ResponseEntity<?> registration(@RequestBody UserRegistration userRegistration) {
         authenticationService.register(userRegistration);
         return new ResponseEntity<>("Пользователь зарегистрирован", HttpStatus.ACCEPTED);
     }
 
-
     @GetMapping("/verification")
-
     public ResponseEntity<?> verify(@RequestParam String mail, @RequestParam String code) {
         MailVerifyDTO mailVerifyDTO = new MailVerifyDTO(code, mail);
         authenticationService.verify(mailVerifyDTO);

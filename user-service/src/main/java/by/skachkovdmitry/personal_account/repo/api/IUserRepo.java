@@ -10,9 +10,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 
-public interface IUserRepo extends JpaRepository<UserEntity, String> {
+public interface IUserRepo extends JpaRepository<UserEntity, UUID> {
     Optional<UserEntity> findByMailAndPassword(String mail, String password);
 
     Optional<UserEntity> findByMail(String mail);

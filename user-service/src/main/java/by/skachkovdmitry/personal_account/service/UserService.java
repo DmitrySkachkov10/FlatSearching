@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,75 +27,35 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User getUserByMail(String mail) {
+    public UserEntity getUserByMail(String mail) {
         UserEntity userEntity = userRepo.findByMail(mail)
                 .orElse(null);
 
         if (userEntity != null) {
-            User user = new User(userEntity.getUuid(),
-                    userEntity.getDtCreate(),
-                    userEntity.getDtUpdate(),
-                    userEntity.getFio(),
-                    userEntity.getMail(),
-                    userEntity.getRole().toString(),
-                    String.valueOf(userEntity.getStatus()));
-            return user;
+            return userEntity;
         } else {
             throw new ValidationError("Запрос содержит некорректные данные. Измените запрос и отправьте его ещё раз");
         }
-
-
     }
 
     @Override
     @Transactional
-    public void save(UserRegistration userRegistration) {
+    public void save(UserEntity userEntity) {
 
-        UserEntity userEntity = new UserEntity();
-        userEntity.setUuid(UUID.randomUUID().toString());
-        userEntity.setDtCreate(LocalDateTime.now());
-        userEntity.setDtUpdate(userEntity.getDtCreate());
-        userEntity.setMail(userRegistration.getMail());
-        userEntity.setPassword(userRegistration.getPassword());
-        userEntity.setFio(userRegistration.getFio());
-        userEntity.setRole(Roles.USER);
-        userEntity.setStatus(Status.WAITING_ACTIVATION);
-
-        if (userRepo.findByMail(userRegistration.getMail()).isPresent()) {
-            Errors<ValidationError> validationErrors = new Errors<>();
-            ValidationError validationError = new ValidationError("Пользователь с такой почтой уже зарегистрирован", "email");
-            validationErrors.add(validationError);
-            throw new StructuredError(validationErrors);
-
-        }
-        try {
-            userRepo.save(userEntity);
-        } catch (Exception e) {
-            throw new DatabaseError("Проблема в системе обратитеь к администратору");
-        }
-
-    }
-
-
-    @Override
-    public void save(UserCreate userCreate) {
-
-        UserEntity userEntity = new UserEntity();
-        userEntity.setUuid(UUID.randomUUID().toString());
-        userEntity.setDtCreate(LocalDateTime.now());
-        userEntity.setDtUpdate(LocalDateTime.now());
-        userEntity.setMail(userCreate.getMail());
-        userEntity.setPassword(userCreate.getPassword());
-        userEntity.setFio(userCreate.getFio());
-        userEntity.setRole(Roles.valueOf(userCreate.getRole()));
-        userEntity.setStatus(Status.valueOf(userCreate.getStatus()));
-
-        if (userRepo.findByMail(userCreate.getMail()).isPresent()) {
+        if (userRepo.findByMail(userEntity.getMail()).isPresent()) {
             Errors<ValidationError> validationErrors = new Errors<>();
             ValidationError validationError = new ValidationError("Пользователь с такой почтой уже зарегистрирован", "email");
             validationErrors.add(validationError);
             throw new StructuredError(validationErrors);
         }
+
+        if (userEntity.getStatus() == null) {
+            userEntity.setRole(Roles.USER);
+        }
+        if (userEntity.getRole() == null) {
+            userEntity.setStatus(Status.WAITING_ACTIVATION);
+        }
+
         try {
             userRepo.save(userEntity);
         } catch (Exception e) {
@@ -104,12 +63,13 @@ public class UserService implements IUserService {
         }
     }
 
-    @Override
-    public boolean exists(UserLogin userLogin) {
 
-        UserEntity userEntity = userRepo.findByMailAndPassword(userLogin.getMail(), userLogin.getPassword()).orElse(null);
-        if (userEntity != null) {
-            if (userEntity.getStatus() != Status.WAITING_ACTIVATION) {
+    @Override
+    public boolean exists(UserEntity userEntity) {
+
+        UserEntity user = userRepo.findByMailAndPassword(userEntity.getMail(), userEntity.getPassword()).orElse(null);
+        if (user != null) {
+            if (user.getStatus() != Status.WAITING_ACTIVATION) {
                 return true;
             } else {
                 throw new VerificationError("Пользователь не прошел верификацию");
@@ -129,7 +89,7 @@ public class UserService implements IUserService {
     public PageOfUser getUsers(Pageable pageable) {
         Page<UserEntity> userEntities = userRepo.findAll(pageable);
 
-        List<User> users = userEntities.stream().map(userEntity -> new User(userEntity.getUuid(),
+        List<User> users = userEntities.stream().map(userEntity -> new User(userEntity.getUuid().toString(),
                         userEntity.getDtCreate(),
                         userEntity.getDtUpdate(),
                         userEntity.getFio(),
@@ -138,7 +98,7 @@ public class UserService implements IUserService {
                         userEntity.getStatus().toString()))
                 .toList();
 
-        PageOfUser pageOfUser = new  PageOfUser(userEntities.getNumber(),
+        PageOfUser pageOfUser = new PageOfUser(userEntities.getNumber(),
                 userEntities.getSize(),
                 userEntities.getTotalPages(),
                 userEntities.getTotalElements(),
@@ -150,5 +110,22 @@ public class UserService implements IUserService {
         pageOfUser.getUserList().forEach(System.out::println);
 
         return pageOfUser;
+    }
+
+
+    @Override
+    public UserEntity getUserByUuid(UUID uuid) {
+        UserEntity userEntity = userRepo.findById(uuid).orElse(null);
+        if (userEntity != null) {
+            return userEntity;
+        } else {
+            throw new ValidationError("Неверное данные");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void update(UserEntity userEntity) {
+        userRepo.save(userEntity);
     }
 }

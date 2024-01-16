@@ -9,12 +9,15 @@ import by.skachkovdmitry.personal_account.core.exception.StructuredError;
 import by.skachkovdmitry.personal_account.core.exception.ValidationError;
 import by.skachkovdmitry.personal_account.core.status.Status;
 import by.skachkovdmitry.personal_account.repo.entity.MailVerifyEntity;
+import by.skachkovdmitry.personal_account.repo.entity.UserEntity;
 import by.skachkovdmitry.personal_account.service.api.IAuthenticationService;
 import by.skachkovdmitry.personal_account.service.api.IMailService;
 import by.skachkovdmitry.personal_account.service.api.IUserService;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.regex.Pattern;
 
 @Service
@@ -39,17 +42,28 @@ public class AuthenticationService implements IAuthenticationService {
 
     @Override
     public boolean logIn(UserLogin userLogin) {
-        return userService.exists(userLogin);
+        UserEntity userEntity = new UserEntity();
+        userEntity.setMail(userLogin.getMail());
+        userEntity.setPassword(userLogin.getPassword());
+        return userService.exists(userEntity);
     }
 
     @Transactional
     @Override
     public void register(UserRegistration userRegistration) {
-
         isValidData(userRegistration);
-        userService.save(userRegistration);
-        mailService.create(userRegistration.getMail());
 
+        UserEntity userEntity = new UserEntity();
+        userEntity.setMail(userRegistration.getMail());
+        userEntity.setPassword(userRegistration.getPassword());
+        userEntity.setFio(userRegistration.getFio());
+        userEntity.setPassword(userRegistration.getPassword());
+
+        userEntity.setDtCreate(LocalDateTime.now());
+        userEntity.setDtUpdate(userEntity.getDtCreate());
+
+        userService.save(userEntity);
+        mailService.create(userRegistration.getMail());
     }
 
     @Override

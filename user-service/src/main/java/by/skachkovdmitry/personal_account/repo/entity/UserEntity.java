@@ -3,23 +3,22 @@ package by.skachkovdmitry.personal_account.repo.entity;
 import by.skachkovdmitry.personal_account.core.role.Roles;
 import by.skachkovdmitry.personal_account.core.status.Status;
 import jakarta.persistence.*;
-import org.hibernate.annotations.GenericGenerator;
-
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(schema = "users", name = "users")
 public class UserEntity {
 
     @Id
-    private String uuid;
+    private UUID uuid;
 
     @Column(name = "create_date")
     private LocalDateTime dtCreate;
 
     @Column(name = "update_date")
+    @Version
     private LocalDateTime dtUpdate;
     private String fio;
     @Column(unique = true)
@@ -34,7 +33,7 @@ public class UserEntity {
     public UserEntity() {
     }
 
-    public UserEntity(String uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, String fio, String mail, Roles role, Status status, String password, boolean verified) {
+    public UserEntity(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, String fio, String mail, Roles role, Status status, String password, boolean verified) {
         this.uuid = uuid;
         this.dtCreate = dtCreate;
         this.dtUpdate = dtUpdate;
@@ -46,7 +45,7 @@ public class UserEntity {
     }
 
 
-    public void setUuid(String uuid) {
+    public void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
 
@@ -98,7 +97,7 @@ public class UserEntity {
         this.password = password;
     }
 
-    public String getUuid() {
+    public UUID getUuid() {
         return uuid;
     }
 

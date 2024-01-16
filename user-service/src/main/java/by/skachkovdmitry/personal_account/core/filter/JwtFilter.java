@@ -2,6 +2,7 @@ package by.skachkovdmitry.personal_account.core.filter;
 
 import by.skachkovdmitry.personal_account.core.dto.User;
 import by.skachkovdmitry.personal_account.core.utils.JwtTokenHandler;
+import by.skachkovdmitry.personal_account.repo.entity.UserEntity;
 import by.skachkovdmitry.personal_account.service.api.IUserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,7 +20,6 @@ import static org.apache.logging.log4j.util.Strings.isEmpty;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
-
 
     private final IUserService userService;
     private final JwtTokenHandler jwtHandler;
@@ -48,10 +48,13 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-
-        User user = userService
+        UserEntity userEntity = userService
                 .getUserByMail(jwtHandler.getUserMail(token));
-        System.out.println(user.getAuthority());
+
+        User user = new User(userEntity.getUuid().toString(), userEntity.getDtCreate(),
+                userEntity.getDtUpdate(), userEntity.getFio(),
+                userEntity.getMail(), userEntity.getRole().toString(),
+                userEntity.getStatus().toString());
 
         UsernamePasswordAuthenticationToken
                 authentication = new UsernamePasswordAuthenticationToken(
@@ -60,7 +63,8 @@ public class JwtFilter extends OncePerRequestFilter {
                         List.of() : user.getAuthorities()
         );
 
-        System.out.println( authentication.getAuthorities());
+
+
         authentication.setDetails(
                 new WebAuthenticationDetailsSource().buildDetails(request)
         );

@@ -13,12 +13,10 @@ import org.hibernate.dialect.lock.OptimisticEntityLockException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.awt.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Service
@@ -73,12 +71,11 @@ public class AdminService implements IAdminService {
 
         UserEntity userEntity= userService.getUserByUuid(uuid);
 
-        long latestUpdate = userEntity.getDtUpdate().toInstant(ZoneOffset.UTC).toEpochMilli();
-
-        LocalDateTime latestUpdateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(latestUpdate), ZoneOffset.UTC);
+        LocalDateTime latestUpdateTime = userEntity.getDtUpdate().truncatedTo(ChronoUnit.MILLIS);
         LocalDateTime lastUpdateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(lastUpdate), ZoneOffset.UTC);
 
         System.out.println(latestUpdateTime + " " + lastUpdateTime);
+
         if (!latestUpdateTime.equals(lastUpdateTime)) {
             throw new IllegalArgumentException("Файл уже редактировался");
         }
@@ -92,7 +89,6 @@ public class AdminService implements IAdminService {
 
         try {
             userService.update(userEntity);
-            System.out.println("ура");
         } catch (OptimisticEntityLockException e) {
             throw new IllegalArgumentException("Докумнент уже редактировался");
         }

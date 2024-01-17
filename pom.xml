@@ -17,14 +17,13 @@
     <modules>
         <module>user-service</module>
         <module>mailing-service</module>
-        <module>exceptions</module>
     </modules>
 
     <dependencies>
         <dependency>
-            <groupId>org.example</groupId>
-            <artifactId>exceptions</artifactId>
-            <version>1.0.0</version>
+            <groupId>by.dmitryskachkov</groupId>
+            <artifactId>exception</artifactId>
+            <version>3.0.0</version>
         </dependency>
     </dependencies>
 

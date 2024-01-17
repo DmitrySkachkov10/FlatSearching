@@ -1,4 +1,4 @@
-package by.skachkovdmitry.personal_account.core.exception;
+package by.dmitryskachkov.entity;
 
 public abstract class Error extends RuntimeException{
     private String message;

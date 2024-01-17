@@ -2,7 +2,7 @@ package by.skachkovdmitry.personal_account.service;
 
 
 import by.skachkovdmitry.personal_account.core.dto.*;
-import by.skachkovdmitry.personal_account.core.exception.*;
+import by.dmitryskachkov.entity.*;
 import by.skachkovdmitry.personal_account.core.role.Roles;
 import by.skachkovdmitry.personal_account.core.status.Status;
 import by.skachkovdmitry.personal_account.repo.api.IUserRepo;
@@ -49,18 +49,19 @@ public class UserService implements IUserService {
             throw new StructuredError(validationErrors);
         }
 
+        System.out.println(userEntity.getRole() + " " + userEntity.getStatus());;
         if (userEntity.getStatus() == null) {
             userEntity.setRole(Roles.USER);
         }
-        if (userEntity.getRole() == null) {
+        if (userEntity.getStatus() == null) {
             userEntity.setStatus(Status.WAITING_ACTIVATION);
         }
 
-        try {
+        //try {
             userRepo.save(userEntity);
-        } catch (Exception e) {
-            throw new DatabaseError("Проблема в системе обратитеь к администратору");
-        }
+//        } catch (Exception e) {
+//            throw new DatabaseError("Проблема в системе обратитеь к администратору");
+//        }
     }
 
 

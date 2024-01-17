@@ -1,4 +1,4 @@
-package by.skachkovdmitry.personal_account.core.exception;
+package by.dmitryskachkov.entity;
 
 public class StructuredError extends RuntimeException {
 

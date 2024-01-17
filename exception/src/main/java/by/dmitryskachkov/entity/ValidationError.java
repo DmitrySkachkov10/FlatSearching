@@ -1,13 +1,12 @@
-package by.skachkovdmitry.personal_account.core.exception;
+package by.dmitryskachkov.entity;
 
 
-public class VerificationError extends Error{
-
-    public VerificationError(String message) {
+public class ValidationError extends Error{
+    public ValidationError(String message) {
         super(message);
     }
 
-    public VerificationError(String message, String field) {
+    public ValidationError(String message, String field) {
         super(message, field);
     }
 
@@ -21,4 +20,3 @@ public class VerificationError extends Error{
         return super.getMessage();
     }
 }
-

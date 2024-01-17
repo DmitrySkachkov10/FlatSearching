@@ -1,5 +1,4 @@
-package by.skachkovdmitry.personal_account.core.exception;
-
+package by.dmitryskachkov.entity;
 import java.util.ArrayList;
 import java.util.List;
 

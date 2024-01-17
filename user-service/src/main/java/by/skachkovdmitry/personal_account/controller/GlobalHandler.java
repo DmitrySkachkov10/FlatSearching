@@ -1,16 +1,19 @@
 package by.skachkovdmitry.personal_account.controller;
 
-import by.skachkovdmitry.personal_account.core.exception.*;
-import by.skachkovdmitry.personal_account.core.exception.Error;
-import org.example.exception.dto.ErrorResponseDto;
-import org.example.exception.dto.structured.ErrorDto;
-import org.example.exception.dto.structured.StructuredErrorDto;
+
+
+
+import by.dmitryskachkov.dto.*;
+import by.dmitryskachkov.entity.*;
+import by.dmitryskachkov.entity.Error;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
 import java.util.List;
+
 
 @RestControllerAdvice(annotations = RestController.class)
 public class GlobalHandler {
@@ -36,8 +39,8 @@ public class GlobalHandler {
 
     }
 
-    @ExceptionHandler(DatabaseError.class)
-    public ResponseEntity<ErrorResponseDto> defaultErrorHandler(DatabaseError e) {
+    @ExceptionHandler(DataBaseError.class)
+    public ResponseEntity<ErrorResponseDto> defaultErrorHandler(DataBaseError e) {
         return new ResponseEntity<>(new ErrorResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

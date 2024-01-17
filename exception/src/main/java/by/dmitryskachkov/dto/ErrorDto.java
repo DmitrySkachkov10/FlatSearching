@@ -1,5 +1,4 @@
-package org.example.exception.dto.structured;
-
+package by.dmitryskachkov.dto;
 import java.util.Objects;
 
 public class ErrorDto {

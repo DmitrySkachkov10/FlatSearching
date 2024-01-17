@@ -7,6 +7,7 @@ import by.skachkovdmitry.personal_account.core.dto.verification.MailVerifyDTO;
 import by.skachkovdmitry.personal_account.core.utils.JwtTokenHandler;
 import by.skachkovdmitry.personal_account.service.api.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +27,7 @@ public class UserController {
     @PostMapping("/registration")
     public ResponseEntity<?> registration(@RequestBody UserRegistration userRegistration) {
         authenticationService.register(userRegistration);
-        return new ResponseEntity<>("Пользователь зарегистрирован", HttpStatus.ACCEPTED);
+        return new ResponseEntity<>("Пользователь зарегистрирован", HttpStatusCode.valueOf(201));
     }
 
     @GetMapping("/verification")

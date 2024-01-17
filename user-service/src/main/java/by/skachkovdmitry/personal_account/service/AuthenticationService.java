@@ -4,9 +4,7 @@ import by.skachkovdmitry.personal_account.core.dto.User;
 import by.skachkovdmitry.personal_account.core.dto.UserLogin;
 import by.skachkovdmitry.personal_account.core.dto.UserRegistration;
 import by.skachkovdmitry.personal_account.core.dto.verification.MailVerifyDTO;
-import by.skachkovdmitry.personal_account.core.exception.Errors;
-import by.skachkovdmitry.personal_account.core.exception.StructuredError;
-import by.skachkovdmitry.personal_account.core.exception.ValidationError;
+import by.dmitryskachkov.entity.*;
 import by.skachkovdmitry.personal_account.core.status.Status;
 import by.skachkovdmitry.personal_account.repo.entity.MailVerifyEntity;
 import by.skachkovdmitry.personal_account.repo.entity.UserEntity;
@@ -18,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 @Service
@@ -57,10 +56,11 @@ public class AuthenticationService implements IAuthenticationService {
         userEntity.setMail(userRegistration.getMail());
         userEntity.setPassword(userRegistration.getPassword());
         userEntity.setFio(userRegistration.getFio());
-        userEntity.setPassword(userRegistration.getPassword());
 
+        userEntity.setUuid(UUID.randomUUID());
         userEntity.setDtCreate(LocalDateTime.now());
         userEntity.setDtUpdate(userEntity.getDtCreate());
+
 
         userService.save(userEntity);
         mailService.create(userRegistration.getMail());

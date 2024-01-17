@@ -1,5 +1,4 @@
-package org.example.exception.dto.structured;
-
+package by.dmitryskachkov.dto;
 import java.util.List;
 import java.util.Objects;
 
@@ -10,7 +9,7 @@ public class StructuredErrorDto {
     public StructuredErrorDto() {
     }
 
-    public StructuredErrorDto(List<org.example.exception.dto.structured.ErrorDto> errorDtos) {
+    public StructuredErrorDto(List<ErrorDto> errorDtos) {
         this.errorDtos = errorDtos;
     }
 
@@ -18,15 +17,15 @@ public class StructuredErrorDto {
         errorDtos.add(errorDto);
     }
 
-    public org.example.exception.dto.structured.ErrorDto getById(int id) {
+    public ErrorDto getById(int id) {
         return errorDtos.get(id);
     }
 
-    public List<org.example.exception.dto.structured.ErrorDto> getErrors() {
+    public List<ErrorDto> getErrors() {
         return errorDtos;
     }
 
-    public void setErrors(List<org.example.exception.dto.structured.ErrorDto> errorDtos) {
+    public void setErrors(List<ErrorDto> errorDtos) {
         this.errorDtos = errorDtos;
     }
 

@@ -3,9 +3,11 @@ package by.skachkovdmitry.personal_account.service;
 import by.skachkovdmitry.personal_account.core.dto.User;
 import by.skachkovdmitry.personal_account.core.dto.UserLogin;
 import by.skachkovdmitry.personal_account.core.dto.UserRegistration;
+import by.skachkovdmitry.personal_account.core.dto.security.UserSecurity;
 import by.skachkovdmitry.personal_account.core.dto.verification.MailVerifyDTO;
 import by.dmitryskachkov.entity.*;
 import by.skachkovdmitry.personal_account.core.status.Status;
+import by.skachkovdmitry.personal_account.core.utils.JwtTokenHandler;
 import by.skachkovdmitry.personal_account.repo.entity.MailVerifyEntity;
 import by.skachkovdmitry.personal_account.repo.entity.UserEntity;
 import by.skachkovdmitry.personal_account.service.api.IAuthenticationService;
@@ -25,6 +27,8 @@ public class AuthenticationService implements IAuthenticationService {
     private final IUserService userService;
     private final IMailService mailService;
 
+    private final JwtTokenHandler jwtHandler;
+
     private final String MAIL_REGEX = "\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*\\.\\w{2,4}";
 
     private final String FIO_REGEX = "^[А-ЯЁ][а-яё]+(\\s[А-ЯЁ][а-яё]+){1,2}";
@@ -34,17 +38,24 @@ public class AuthenticationService implements IAuthenticationService {
     private final String COMMON_ERROR_MESSAGE = "Запрос содержит некорректные данные. Измените запрос и отправьте его ещё раз";
 
 
-    public AuthenticationService(IUserService userService, IMailService mailService) {
+    public AuthenticationService(IUserService userService, IMailService mailService, JwtTokenHandler jwtHandler) {
         this.userService = userService;
         this.mailService = mailService;
+        this.jwtHandler = jwtHandler;
     }
 
     @Override
-    public boolean logIn(UserLogin userLogin) {
-        UserEntity userEntity = new UserEntity();
-        userEntity.setMail(userLogin.getMail());
-        userEntity.setPassword(userLogin.getPassword());
-        return userService.exists(userEntity);
+    public String logIn(UserLogin userLogin) {
+        UserEntity userEntity = userService.logIn(userLogin);
+        User user = new User(userEntity.getUuid().toString(),
+                userEntity.getDtCreate(),
+                userEntity.getDtUpdate(),
+                userEntity.getFio(),
+                userEntity.getMail(),
+                userEntity.getRole().toString(),
+                userEntity.getStatus().toString());
+
+        return jwtHandler.generateAccessToken(new UserSecurity(user.getMail(), user.getRole()));
     }
 
     @Transactional
@@ -68,7 +79,20 @@ public class AuthenticationService implements IAuthenticationService {
 
     @Override
     public User myInfo() {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserSecurity userSecurity = (UserSecurity) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        UserEntity userEntity = userService.getUserByMail(userSecurity.getMail());
+
+        return new User(userEntity.getUuid().toString(),
+                userEntity.getDtCreate(),
+                userEntity.getDtUpdate(),
+                userEntity.getFio(),
+                userEntity.getMail(),
+                userEntity.getRole().toString(),
+                userEntity.getStatus().toString());
     }
 
     @Override

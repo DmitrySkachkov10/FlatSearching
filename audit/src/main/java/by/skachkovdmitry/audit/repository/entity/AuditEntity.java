@@ -1,8 +1,9 @@
 package by.skachkovdmitry.audit.repository.entity;
 
-import by.skachkovdmitry.audit.core.EssenceType;
+import by.skachkovdmitry.audit.core.enums.EssenceType;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -14,9 +15,9 @@ public class AuditEntity {
     private UUID uuid;
 
     @Column(name = "dt_create")
-    private long dtCreate;
+    private LocalDateTime dtCreate;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_uuid")
     private UserEntity user;
 
@@ -31,7 +32,7 @@ public class AuditEntity {
     public AuditEntity() {
     }
 
-    public AuditEntity(UUID uuid, long dtCreate, UserEntity user, String text, EssenceType essenceType, String id) {
+    public AuditEntity(UUID uuid, LocalDateTime dtCreate, UserEntity user, String text, EssenceType essenceType, String id) {
         this.uuid = uuid;
         this.dtCreate = dtCreate;
         this.user = user;
@@ -48,11 +49,11 @@ public class AuditEntity {
         this.uuid = uuid;
     }
 
-    public long getDt_create() {
+    public LocalDateTime getDt_create() {
         return dtCreate;
     }
 
-    public void setDt_create(long dtCreate) {
+    public void setDt_create(LocalDateTime dtCreate) {
         this.dtCreate = dtCreate;
     }
 

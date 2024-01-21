@@ -1,10 +1,8 @@
-package by.skachkovdmitry.personal_account.core.filter;
+package by.skachkovdmitry.audit.core.filter;
 
-import by.skachkovdmitry.personal_account.core.dto.User;
-import by.skachkovdmitry.personal_account.core.dto.security.UserSecurity;
-import by.skachkovdmitry.personal_account.core.utils.JwtTokenHandler;
-import by.skachkovdmitry.personal_account.repo.entity.UserEntity;
-import by.skachkovdmitry.personal_account.service.api.IUserService;
+
+import by.skachkovdmitry.audit.core.security.UserSecurity;
+import by.skachkovdmitry.audit.core.utils.JwtTokenHandler;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,16 +13,19 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 import java.util.List;
+
 import static org.apache.logging.log4j.util.Strings.isEmpty;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
+
     private final JwtTokenHandler jwtHandler;
 
-    public JwtFilter(JwtTokenHandler jwtHandler) {
+    public JwtFilter( JwtTokenHandler jwtHandler) {
         this.jwtHandler = jwtHandler;
     }
 
@@ -48,6 +49,8 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         UserSecurity userSecurity = jwtHandler.getUser(token);
+
+        System.out.println(userSecurity.getRole());
 
         UsernamePasswordAuthenticationToken
                 authentication = new UsernamePasswordAuthenticationToken(

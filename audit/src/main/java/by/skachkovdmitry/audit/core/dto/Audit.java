@@ -1,15 +1,21 @@
 package by.skachkovdmitry.audit.core.dto;
 
-import by.skachkovdmitry.audit.core.EssenceType;
+import by.skachkovdmitry.audit.config.properies.LocalDateTimeUnixTimestampSerializer;
+import by.skachkovdmitry.audit.config.properies.UnixTimestampToLocalDateTimeDeserializer;
+import by.skachkovdmitry.audit.core.enums.EssenceType;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.UUID;
 
 public class Audit {
 
     private String uuid;
 
-    private long dt_create;
+    @JsonSerialize(using = LocalDateTimeUnixTimestampSerializer.class)
+    @JsonDeserialize(using = UnixTimestampToLocalDateTimeDeserializer.class)
+    private LocalDateTime dt_create;
 
     private User user;
 
@@ -22,7 +28,7 @@ public class Audit {
     public Audit() {
     }
 
-    public Audit(String uuid, long dt_create, User user, String text, EssenceType essenceType, String id) {
+    public Audit(String uuid, LocalDateTime dt_create, User user, String text, EssenceType essenceType, String id) {
         this.uuid = uuid;
         this.dt_create = dt_create;
         this.user = user;
@@ -39,11 +45,11 @@ public class Audit {
         this.uuid = uuid;
     }
 
-    public long getDt_create() {
+    public LocalDateTime getDt_create() {
         return dt_create;
     }
 
-    public void setDt_create(long dt_create) {
+    public void setDt_create(LocalDateTime dt_create) {
         this.dt_create = dt_create;
     }
 

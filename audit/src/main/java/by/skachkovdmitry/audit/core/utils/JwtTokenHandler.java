@@ -1,11 +1,12 @@
-package by.skachkovdmitry.personal_account.core.utils;
+package by.skachkovdmitry.audit.core.utils;
 
-import by.skachkovdmitry.personal_account.config.properties.JWTProperty;
-import by.skachkovdmitry.personal_account.core.dto.security.UserSecurity;
+import by.skachkovdmitry.audit.config.properies.JWTProperty;
+import by.skachkovdmitry.audit.core.security.UserSecurity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;
+
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 

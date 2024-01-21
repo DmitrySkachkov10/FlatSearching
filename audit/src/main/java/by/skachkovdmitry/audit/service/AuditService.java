@@ -1,7 +1,9 @@
 package by.skachkovdmitry.audit.service;
 
-import by.skachkovdmitry.audit.core.DtoEntityMapper;
+import by.skachkovdmitry.audit.core.enums.EssenceType;
+import by.skachkovdmitry.audit.core.mapper.DtoEntityMapper;
 import by.skachkovdmitry.audit.core.dto.Audit;
+import by.skachkovdmitry.audit.core.dto.InputInfo;
 import by.skachkovdmitry.audit.core.dto.PageOfAudit;
 import by.skachkovdmitry.audit.repository.api.IAuditRepo;
 import by.skachkovdmitry.audit.repository.entity.AuditEntity;
@@ -9,6 +11,9 @@ import by.skachkovdmitry.audit.service.api.IAuditService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Service
@@ -24,22 +29,17 @@ public class AuditService implements IAuditService {
     }
 
     @Override
-    public void save(Audit audit) {
-        try {
+    public void save(InputInfo inputInfo) {
 
-            auditRepo.save(new AuditEntity(UUID.fromString(audit.getUuid()),
-                    audit.getDt_create(),
-                    dtoEntityMapper.mapDtoToEntity(audit.getUser()),
-                    audit.getText(),
-                    audit.getEssenceType(),
-                    audit.getId()));
+            auditRepo.save(new AuditEntity(UUID.randomUUID(),
+                    LocalDateTime.now(),
+                    dtoEntityMapper.mapDtoToEntity(inputInfo.getUser()),
+                    inputInfo.getText(),
+                    EssenceType.valueOf(inputInfo.getEssenceType()),
+                    inputInfo.getId()));
 
             System.out.println("аудит добавлен в базу");
 
-        } catch (Exception e) {
-            System.out.println("Ошибка подключение к базе audita");
-
-        }
     }
 
     @Override
@@ -69,7 +69,7 @@ public class AuditService implements IAuditService {
                 .getContent()
                 .stream()
                 .map(elem -> new Audit(elem.getUuid().toString(),
-                        elem.getDt_create(),
+                        elem.getDt_create().truncatedTo(ChronoUnit.MILLIS),
                         dtoEntityMapper.mapEntityToDto(elem.getUser()),
                         elem.getText(),
                         elem.getEssenceType(),

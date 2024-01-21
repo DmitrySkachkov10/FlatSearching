@@ -1,7 +1,5 @@
 package by.skachkovdmitry.audit.core.dto;
 
-import by.skachkovdmitry.audit.core.Roles;
-
 import java.util.Objects;
 
 public class User {

@@ -1,6 +1,7 @@
-package by.skachkovdmitry.personal_account.config;
+package by.skachkovdmitry.audit.config;
 
-import by.skachkovdmitry.personal_account.core.filter.JwtFilter;
+
+import by.skachkovdmitry.audit.core.filter.JwtFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig{
+public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -49,11 +50,6 @@ public class SecurityConfig{
                 });
 
         http.authorizeRequests(requests -> requests
-                // Our public endpoints
-                .requestMatchers("/user/registration").permitAll()
-                .requestMatchers("/user/verification").permitAll()
-                .requestMatchers("/user/login").permitAll()
-                .requestMatchers("/user/me").authenticated()
                 .anyRequest().hasRole("ADMIN")
         );
 

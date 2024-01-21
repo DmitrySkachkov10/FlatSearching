@@ -3,6 +3,7 @@ package by.skachkovdmitry.personal_account.controller;
 import by.skachkovdmitry.personal_account.core.dto.User;
 import by.skachkovdmitry.personal_account.core.dto.UserLogin;
 import by.skachkovdmitry.personal_account.core.dto.UserRegistration;
+import by.skachkovdmitry.personal_account.core.dto.security.UserSecurity;
 import by.skachkovdmitry.personal_account.core.dto.verification.MailVerifyDTO;
 import by.skachkovdmitry.personal_account.core.utils.JwtTokenHandler;
 import by.skachkovdmitry.personal_account.service.api.*;
@@ -32,24 +33,19 @@ public class UserController {
 
     @GetMapping("/verification")
     public ResponseEntity<?> verify(@RequestParam String mail, @RequestParam String code) {
-        MailVerifyDTO mailVerifyDTO = new MailVerifyDTO(code, mail);
-        authenticationService.verify(mailVerifyDTO);
+        authenticationService.verify(new MailVerifyDTO(code, mail));
         return new ResponseEntity<>("Пользователь верифицирован", HttpStatus.ACCEPTED);
     }
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody UserLogin userLogin) {
-        if (authenticationService.logIn(userLogin)) {
-            String token = jwtHandler.generateAccessToken(userLogin.getMail());
-            return new ResponseEntity<>(token, HttpStatus.ACCEPTED);
-        }
-        return new ResponseEntity<>("Запрос содержит некорректные данные. Измените запрос и отправьте его ещё раз",
-                HttpStatus.BAD_REQUEST);
+        String token = authenticationService.logIn(userLogin);
+        return new ResponseEntity<>(token, HttpStatus.ACCEPTED);
+
     }
 
     @GetMapping("/me")
     public ResponseEntity<?> getInfo() {
-        User user = authenticationService.myInfo();
-        return new ResponseEntity<>(user, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(authenticationService.myInfo(), HttpStatus.ACCEPTED);
     }
 }

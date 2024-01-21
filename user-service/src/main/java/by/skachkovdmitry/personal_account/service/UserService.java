@@ -49,7 +49,8 @@ public class UserService implements IUserService {
             throw new StructuredError(validationErrors);
         }
 
-        System.out.println(userEntity.getRole() + " " + userEntity.getStatus());;
+        System.out.println(userEntity.getRole() + " " + userEntity.getStatus());
+        ;
         if (userEntity.getStatus() == null) {
             userEntity.setRole(Roles.USER);
         }
@@ -58,7 +59,7 @@ public class UserService implements IUserService {
         }
 
         //try {
-            userRepo.save(userEntity);
+        userRepo.save(userEntity);
 //        } catch (Exception e) {
 //            throw new DatabaseError("Проблема в системе обратитеь к администратору");
 //        }
@@ -66,18 +67,16 @@ public class UserService implements IUserService {
 
 
     @Override
-    public boolean exists(UserEntity userEntity) {
-
-        UserEntity user = userRepo.findByMailAndPassword(userEntity.getMail(), userEntity.getPassword()).orElse(null);
+    public UserEntity logIn(UserLogin userLogin) {
+        UserEntity user = userRepo.findByMailAndPassword(userLogin.getMail(), userLogin.getPassword()).orElse(null);
         if (user != null) {
             if (user.getStatus() != Status.WAITING_ACTIVATION) {
-                return true;
+                return user;
             } else {
                 throw new VerificationError("Пользователь не прошел верификацию");
             }
-        } else {
-            return false;
         }
+        throw new ValidationError("Неверные данные для входа");
     }
 
     @Override

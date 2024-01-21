@@ -1,5 +1,6 @@
-package by.skachkovdmitry.audit.core;
+package by.skachkovdmitry.audit.core.mapper;
 
+import by.skachkovdmitry.audit.core.enums.Roles;
 import by.skachkovdmitry.audit.core.dto.User;
 import by.skachkovdmitry.audit.repository.entity.UserEntity;
 import org.springframework.stereotype.Component;

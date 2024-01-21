@@ -1,6 +1,6 @@
 package by.skachkovdmitry.audit.repository.entity;
 
-import by.skachkovdmitry.audit.core.Roles;
+import by.skachkovdmitry.audit.core.enums.Roles;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -24,6 +24,7 @@ public class UserEntity {
 
 
     @OneToMany(mappedBy = "user")
+    @Transient
     private List<AuditEntity> audits;
     public UserEntity() {
     }

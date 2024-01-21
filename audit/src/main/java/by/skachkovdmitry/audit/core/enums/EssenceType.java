@@ -1,4 +1,4 @@
-package by.skachkovdmitry.audit.core;
+package by.skachkovdmitry.audit.core.enums;
 
 public enum EssenceType {
     USER,

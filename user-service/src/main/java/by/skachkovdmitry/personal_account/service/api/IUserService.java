@@ -5,7 +5,6 @@ import by.skachkovdmitry.personal_account.core.status.Status;
 import by.skachkovdmitry.personal_account.repo.entity.UserEntity;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.UUID;
 
 
@@ -18,7 +17,7 @@ public interface IUserService {
 
     void save(UserEntity user);
 
-    boolean exists(UserEntity userEntity);
+    UserEntity logIn(UserLogin userLogin);
 
     void update(UserEntity userEntity);
 

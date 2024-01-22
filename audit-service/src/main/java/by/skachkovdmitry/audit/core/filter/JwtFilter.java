@@ -35,11 +35,13 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain chain)
             throws ServletException, IOException {
 
+        System.out.println("1");
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (isEmpty(header) || !header.startsWith("Bearer ")) {
             chain.doFilter(request, response);
             return;
         }
+        System.out.println("2");
 
         // Get jwt token and validate
         final String token = header.split(" ")[1].trim();
@@ -48,10 +50,14 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
+        System.out.println("3");
         UserSecurity userSecurity = jwtHandler.getUser(token);
+
+        System.out.println("4");
 
         System.out.println(userSecurity.getRole());
 
+        System.out.println("5");
         UsernamePasswordAuthenticationToken
                 authentication = new UsernamePasswordAuthenticationToken(
                 userSecurity, null,

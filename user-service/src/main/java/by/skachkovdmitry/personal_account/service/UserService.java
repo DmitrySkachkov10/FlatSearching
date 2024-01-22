@@ -50,7 +50,6 @@ public class UserService implements IUserService {
         }
 
         System.out.println(userEntity.getRole() + " " + userEntity.getStatus());
-        ;
         if (userEntity.getStatus() == null) {
             userEntity.setRole(Roles.USER);
         }
@@ -111,7 +110,6 @@ public class UserService implements IUserService {
 
         return pageOfUser;
     }
-
 
     @Override
     public UserEntity getUserByUuid(UUID uuid) {

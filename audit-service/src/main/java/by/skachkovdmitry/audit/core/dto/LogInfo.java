@@ -1,10 +1,9 @@
 package by.skachkovdmitry.audit.core.dto;
 
-
 @lombok.Getter
 @lombok.Setter
 @lombok.EqualsAndHashCode
-public class InputInfo {
+public class LogInfo {
 
 
     private User user;
@@ -15,14 +14,15 @@ public class InputInfo {
 
     private String id;
 
-    public InputInfo() {
+    public LogInfo() {
     }
 
-    public InputInfo(User user, String essenceType, String text, String id) {
+    public LogInfo(User user, String essenceType, String text, String id) {
         this.user = user;
         this.essenceType = essenceType;
         this.text = text;
         this.id = id;
     }
+
 
 }

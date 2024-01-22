@@ -17,7 +17,7 @@
     <modules>
         <module>user-service</module>
         <module>mailing-service</module>
-        <module>audit</module>
+        <module>audit-service</module>
     </modules>
 
     <dependencies>

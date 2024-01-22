@@ -55,7 +55,10 @@ public class AuthenticationService implements IAuthenticationService {
                 userEntity.getRole().toString(),
                 userEntity.getStatus().toString());
 
-        return jwtHandler.generateAccessToken(new UserSecurity(user.getMail(), user.getRole()));
+        return jwtHandler.generateAccessToken(new UserSecurity(user.getUuid(),
+                user.getMail(),
+                user.getFio(),
+                user.getRole()));
     }
 
     @Transactional
@@ -71,7 +74,6 @@ public class AuthenticationService implements IAuthenticationService {
         userEntity.setUuid(UUID.randomUUID());
         userEntity.setDtCreate(LocalDateTime.now());
         userEntity.setDtUpdate(userEntity.getDtCreate());
-
 
         userService.save(userEntity);
         mailService.create(userRegistration.getMail());

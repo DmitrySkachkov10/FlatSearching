@@ -1,9 +1,9 @@
 package by.skachkovdmitry.audit.service;
 
 import by.skachkovdmitry.audit.core.enums.EssenceType;
-import by.skachkovdmitry.audit.core.mapper.DtoEntityMapper;
+import by.skachkovdmitry.audit.core.mapper.DtoUserToEntityMapper;
 import by.skachkovdmitry.audit.core.dto.Audit;
-import by.skachkovdmitry.audit.core.dto.InputInfo;
+import by.skachkovdmitry.audit.core.dto.LogInfo;
 import by.skachkovdmitry.audit.core.dto.PageOfAudit;
 import by.skachkovdmitry.audit.repository.api.IAuditRepo;
 import by.skachkovdmitry.audit.repository.entity.AuditEntity;
@@ -21,22 +21,22 @@ public class AuditService implements IAuditService {
 
     private final IAuditRepo auditRepo;
 
-    private final DtoEntityMapper dtoEntityMapper;
+    private final DtoUserToEntityMapper dtoUserToEntityMapper;
 
-    public AuditService(IAuditRepo auditRepo, DtoEntityMapper dtoEntityMapper) {
+    public AuditService(IAuditRepo auditRepo, DtoUserToEntityMapper dtoUserToEntityMapper) {
         this.auditRepo = auditRepo;
-        this.dtoEntityMapper = dtoEntityMapper;
+        this.dtoUserToEntityMapper = dtoUserToEntityMapper;
     }
 
     @Override
-    public void save(InputInfo inputInfo) {
+    public void save(LogInfo logInfo) {
 
             auditRepo.save(new AuditEntity(UUID.randomUUID(),
                     LocalDateTime.now(),
-                    dtoEntityMapper.mapDtoToEntity(inputInfo.getUser()),
-                    inputInfo.getText(),
-                    EssenceType.valueOf(inputInfo.getEssenceType()),
-                    inputInfo.getId()));
+                    dtoUserToEntityMapper.mapDtoToEntity(logInfo.getUser()),
+                    logInfo.getText(),
+                    EssenceType.valueOf(logInfo.getEssenceType()),
+                    logInfo.getId()));
 
             System.out.println("аудит добавлен в базу");
 
@@ -47,7 +47,7 @@ public class AuditService implements IAuditService {
         AuditEntity auditEntity = auditRepo.getById(uuid);
         return new Audit(auditEntity.getUuid().toString(),
                 auditEntity.getDt_create(),
-                dtoEntityMapper.mapEntityToDto(auditEntity.getUser()),
+                dtoUserToEntityMapper.mapEntityToDto(auditEntity.getUser()),
                 auditEntity.getText(),
                 auditEntity.getEssenceType(),
                 auditEntity.getId());
@@ -70,7 +70,7 @@ public class AuditService implements IAuditService {
                 .stream()
                 .map(elem -> new Audit(elem.getUuid().toString(),
                         elem.getDt_create().truncatedTo(ChronoUnit.MILLIS),
-                        dtoEntityMapper.mapEntityToDto(elem.getUser()),
+                        dtoUserToEntityMapper.mapEntityToDto(elem.getUser()),
                         elem.getText(),
                         elem.getEssenceType(),
                         elem.getId())).toList());

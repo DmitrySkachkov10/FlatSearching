@@ -8,7 +8,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @SpringBootApplication
 @EnableConfigurationProperties({JWTProperty.class})
 public class AuditApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(AuditApplication.class, args);
 	}

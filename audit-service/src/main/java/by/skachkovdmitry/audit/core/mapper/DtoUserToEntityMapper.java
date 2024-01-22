@@ -9,9 +9,9 @@ import java.util.UUID;
 
 
 @Component
-public class DtoEntityMapper {
+public class DtoUserToEntityMapper {
 
-    public DtoEntityMapper() {
+    public DtoUserToEntityMapper() {
     }
 
     public User mapEntityToDto(UserEntity user) {
@@ -19,9 +19,13 @@ public class DtoEntityMapper {
     }
 
     public UserEntity mapDtoToEntity(User user) {
-        return new UserEntity(UUID.fromString(user.getUuid()),
-                user.getMail(),
-                user.getFio(),
-                Roles.valueOf(user.getRole()));
+        if (user != null) {
+            return new UserEntity(UUID.fromString(user.getUuid()),
+                    user.getMail(),
+                    user.getFio(),
+                    Roles.valueOf(user.getRole()));
+        } else {
+            return new UserEntity(UUID.randomUUID(), "no-mail", "no-fio", null);
+        }
     }
 }

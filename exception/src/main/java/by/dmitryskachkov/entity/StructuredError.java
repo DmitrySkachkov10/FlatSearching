@@ -1,6 +1,6 @@
 package by.dmitryskachkov.entity;
 
-public class StructuredError extends RuntimeException {
+public class StructuredError extends Error {
 
     private Errors errors;
 

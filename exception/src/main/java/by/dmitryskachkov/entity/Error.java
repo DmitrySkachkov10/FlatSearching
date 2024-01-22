@@ -32,4 +32,12 @@ public abstract class Error extends RuntimeException{
     public void setField(String field) {
         this.field = field;
     }
+
+    @java.lang.Override
+    public java.lang.String toString() {
+        return "Error{" +
+                "message='" + message + '\'' +
+                ", field='" + field + '\'' +
+                '}';
+    }
 }

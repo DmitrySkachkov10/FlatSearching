@@ -1,7 +1,9 @@
 package by.skachkovdmitry.audit.controller;
 
-import by.skachkovdmitry.audit.core.dto.InputInfo;
+
+import by.skachkovdmitry.audit.core.dto.LogInfo;
 import by.skachkovdmitry.audit.service.api.IAuditService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,9 +22,8 @@ public class UploadController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<String> saveData(@RequestBody InputInfo inputInfo) {
-        auditService.save(inputInfo);
-        return new ResponseEntity<>("cool", HttpStatusCode.valueOf(200));
-
+    public ResponseEntity<Void> saveData(@RequestBody LogInfo logInfo) {
+        auditService.save(logInfo);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

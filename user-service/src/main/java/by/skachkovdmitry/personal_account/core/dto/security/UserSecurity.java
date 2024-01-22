@@ -10,14 +10,19 @@ import java.util.Objects;
 
 public class UserSecurity implements GrantedAuthority {
 
+    private String uuid;
     private String mail;
+
+    private String fio;
     private String role;
 
     public UserSecurity() {
     }
 
-    public UserSecurity(String mail, String role) {
+    public UserSecurity(String uuid, String mail, String fio, String role) {
+        this.uuid = uuid;
         this.mail = mail;
+        this.fio = fio;
         this.role = role;
     }
 
@@ -32,12 +37,28 @@ public class UserSecurity implements GrantedAuthority {
         return Arrays.asList(new SimpleGrantedAuthority("ROLE_" + role));
     }
 
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
     public String getMail() {
         return mail;
     }
 
     public void setMail(String mail) {
         this.mail = mail;
+    }
+
+    public String getFio() {
+        return fio;
+    }
+
+    public void setFio(String fio) {
+        this.fio = fio;
     }
 
     public String getRole() {
@@ -52,12 +73,11 @@ public class UserSecurity implements GrantedAuthority {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof UserSecurity that)) return false;
-        return Objects.equals(mail, that.mail) && Objects.equals(role, that.role);
+        return Objects.equals(uuid, that.uuid) && Objects.equals(mail, that.mail) && Objects.equals(fio, that.fio) && Objects.equals(role, that.role);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mail, role);
+        return Objects.hash(uuid, mail, fio, role);
     }
-
 }

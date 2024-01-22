@@ -20,6 +20,7 @@ public class UserEntity {
     private String fio;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
     private Roles role;
 
 

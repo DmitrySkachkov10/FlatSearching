@@ -1,5 +1,6 @@
 package by.skachkovdmitry.personal_account.aop;
 
+import by.dmitryskachkov.entity.Error;
 import by.skachkovdmitry.personal_account.core.dto.LogInfo;
 import by.skachkovdmitry.personal_account.core.dto.security.UserSecurity;
 import by.skachkovdmitry.personal_account.service.api.feign.LogService;

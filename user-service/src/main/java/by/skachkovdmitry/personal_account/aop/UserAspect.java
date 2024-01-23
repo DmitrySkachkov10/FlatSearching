@@ -37,17 +37,16 @@ public class UserAspect {
         LogInfo logInfo = new LogInfo();
         logInfo.setEssenceType("USER");
         logInfo.setText(logText);
-        try {
-            Object result = joinPoint.proceed();
-            logInfo.setUser((UserSecurity) SecurityContextHolder
-                    .getContext()
-                    .getAuthentication()
-                    .getPrincipal());
-            logInfo.setId(signature.getName());
-            logService.send(logInfo);
-            return result;
-        } catch (Error e) {
-            throw e;
-        }
+
+        Object result = joinPoint.proceed();
+        logInfo.setUser((UserSecurity) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal());
+        logInfo.setId(signature.getName());
+        logService.send(logInfo);
+        return result;
+
     }
+
 }

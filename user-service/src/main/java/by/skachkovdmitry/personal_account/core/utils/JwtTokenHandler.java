@@ -6,7 +6,12 @@ import by.skachkovdmitry.personal_account.core.dto.security.UserSecurity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -17,6 +22,7 @@ public class JwtTokenHandler {
 
     private final ObjectMapper objectMapper;
 
+
     public JwtTokenHandler(JWTProperty property, ObjectMapper objectMapper) {
         this.property = property;
         this.objectMapper = objectMapper;
@@ -24,17 +30,27 @@ public class JwtTokenHandler {
 
     public String generateAccessToken(UserSecurity userSecurity) {
         try {
-            return Jwts.builder()
+            String token = Jwts.builder()
                     .setSubject(objectMapper.writeValueAsString(userSecurity))
                     .setIssuer(property.getIssuer())
                     .setIssuedAt(new Date())
                     .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(7))) // 1 week
                     .signWith(SignatureAlgorithm.HS512, property.getSecret())
                     .compact();
+            addToContext(userSecurity);
+            return token;
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
+
+
+    private void addToContext(UserSecurity userSecurity) {
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken(userSecurity, null, userSecurity.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
 
     public UserSecurity getUser(String token) {
         Claims claims = Jwts.parser()

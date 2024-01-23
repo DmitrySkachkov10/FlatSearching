@@ -15,7 +15,6 @@ import java.util.UUID;
 @RequestMapping("/audit")
 public class AuditController {
 
-
     private final IAuditService auditService;
 
     public AuditController(IAuditService auditService) {
@@ -24,7 +23,7 @@ public class AuditController {
 
     @GetMapping
     public ResponseEntity<PageOfAudit> getPage(@RequestParam int page, @RequestParam int size) {
-        PageOfAudit pageOfAudit = auditService.getPageOfAudit(PageRequest.of(page, size));
+        PageOfAudit pageOfAudit = auditService.getPageOfAudit(PageRequest.of(page - 1, size));
         return new ResponseEntity<>(pageOfAudit, HttpStatusCode.valueOf(200));
     }
 

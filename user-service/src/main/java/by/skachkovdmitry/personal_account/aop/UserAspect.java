@@ -1,7 +1,5 @@
 package by.skachkovdmitry.personal_account.aop;
 
-import by.dmitryskachkov.dto.ErrorDto;
-import by.dmitryskachkov.entity.*;
 import by.dmitryskachkov.entity.Error;
 import by.skachkovdmitry.personal_account.core.dto.LogInfo;
 import by.skachkovdmitry.personal_account.core.dto.security.UserSecurity;
@@ -9,13 +7,10 @@ import by.skachkovdmitry.personal_account.service.api.feign.LogService;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.aspectj.lang.annotation.Aspect;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Aspect
 @Component
@@ -27,59 +22,31 @@ public class UserAspect {
         this.logService = logService;
     }
 
-    @Pointcut("execution(* by.skachkovdmitry.personal_account.service.AuthenticationService.*(..))")
-    private void beforeAuthorizationMethods() {
+    @Around("execution(* by.skachkovdmitry.personal_account.service.AuthenticationService.logIn(..))")
+    public Object login(ProceedingJoinPoint joinPoint) throws Throwable {
+        return handleMethod(joinPoint, "Пользователь вошел в систему");
     }
 
-    @Pointcut("execution(* by.skachkovdmitry.personal_account.service.AuthenticationService.myInfo(..))")
-    private void myInfoMethod() {
+    @Around("execution(* by.skachkovdmitry.personal_account.service.AuthenticationService.myInfo(..))")
+    public Object userInfo(ProceedingJoinPoint joinPoint) throws Throwable {
+        return handleMethod(joinPoint, "Получение информации в профиле");
     }
 
-    @Around("beforeAuthorizationMethods() && !myInfoMethod()")
-    public Object handleBeforeAuthorization(ProceedingJoinPoint joinPoint) throws Throwable {
+    private Object handleMethod(ProceedingJoinPoint joinPoint, String logText) throws Throwable {
         Signature signature = joinPoint.getSignature();
-        return handleMethod(joinPoint, signature, null);
-    }
-
-    @Around("myInfoMethod()")
-    public Object handleAfterAuthorization(ProceedingJoinPoint joinPoint) throws Throwable {
-        Signature signature = joinPoint.getSignature();
-        UserSecurity user = (UserSecurity) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-
-        return handleMethod(joinPoint, signature, user);
-    }
-
-    private Object handleMethod(ProceedingJoinPoint joinPoint, Signature signature, UserSecurity user) throws Throwable {
         LogInfo logInfo = new LogInfo();
         logInfo.setEssenceType("USER");
-        logInfo.setUser(user);
-
+        logInfo.setText(logText);
         try {
-            Object object = joinPoint.proceed();
-            logInfo.setId(signature.getDeclaringTypeName());
-            logInfo.setText(signature.getName().toString());
-            System.out.println(logInfo.getText() + " in " + logInfo.getId());
+            Object result = joinPoint.proceed();
+            logInfo.setUser((UserSecurity) SecurityContextHolder
+                    .getContext()
+                    .getAuthentication()
+                    .getPrincipal());
+            logInfo.setId(signature.getName());
             logService.send(logInfo);
-            return object;
-
+            return result;
         } catch (Error e) {
-            if (e instanceof StructuredError) {
-                logInfo.setId(signature.getDeclaringTypeName());
-                String result = ((StructuredError)e).getErrors().getErrorList().stream()
-                        .map(er -> "Field: " + ((Error) er).getField())
-                        .collect(Collectors.joining(", ")).toString();
-                logInfo.setText(result);
-                System.out.println(logInfo.getText() + " in " + logInfo.getId());
-                logService.send(logInfo);
-            } else {
-                logInfo.setId(signature.getDeclaringTypeName());
-                logInfo.setText(signature.getName());
-                System.out.println(logInfo.getText() + " in " + logInfo.getId());
-                logService.send(logInfo);
-            }
             throw e;
         }
     }

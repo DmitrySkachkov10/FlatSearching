@@ -1,10 +1,7 @@
 package by.skachkovdmitry.personal_account.core.filter;
 
-import by.skachkovdmitry.personal_account.core.dto.User;
 import by.skachkovdmitry.personal_account.core.dto.security.UserSecurity;
 import by.skachkovdmitry.personal_account.core.utils.JwtTokenHandler;
-import by.skachkovdmitry.personal_account.repo.entity.UserEntity;
-import by.skachkovdmitry.personal_account.service.api.IUserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,8 +12,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 import java.util.List;
+
 import static org.apache.logging.log4j.util.Strings.isEmpty;
 
 @Component

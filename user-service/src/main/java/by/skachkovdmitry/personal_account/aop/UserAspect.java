@@ -32,21 +32,26 @@ public class UserAspect {
         return handleMethod(joinPoint, "Получение информации в профиле");
     }
 
-    private Object handleMethod(ProceedingJoinPoint joinPoint, String logText) throws Throwable {
+    private Object handleMethod(ProceedingJoinPoint joinPoint, String action) throws Throwable {
         Signature signature = joinPoint.getSignature();
         LogInfo logInfo = new LogInfo();
         logInfo.setEssenceType("USER");
-        logInfo.setText(logText);
-
-        Object result = joinPoint.proceed();
-        logInfo.setUser((UserSecurity) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal());
         logInfo.setId(signature.getName());
-        logService.send(logInfo);
-        return result;
-
+        logInfo.setUser(null);
+        try {
+            Object result = joinPoint.proceed();
+            logInfo.setText(action);
+            logInfo.setUser((UserSecurity) SecurityContextHolder
+                    .getContext()
+                    .getAuthentication()
+                    .getPrincipal());
+            logService.send(logInfo);
+            return result;
+        } catch (Error e) {
+            logInfo.setText("Ошибка в " + action + ": " + e.getMessage());
+            logService.send(logInfo);
+            throw e;
+        }
     }
 
 }

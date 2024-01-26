@@ -4,6 +4,7 @@ import by.skachkovdmitry.audit.core.dto.PageOfReport;
 import by.skachkovdmitry.audit.core.dto.Report;
 import by.skachkovdmitry.audit.core.dto.UserActionAuditParam;
 import by.skachkovdmitry.audit.core.enums.ReportStatus;
+import by.skachkovdmitry.audit.core.enums.ReportType;
 import by.skachkovdmitry.audit.repository.api.IReportRepo;
 import by.skachkovdmitry.audit.repository.entity.ReportEntity;
 import by.skachkovdmitry.audit.service.api.IReportService;
@@ -15,7 +16,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class ReportService implements IReportService {
-
     private final IReportRepo reportRepo;
     private final String FROM = "from: ";
     private final String TO = " to: ";
@@ -24,15 +24,18 @@ public class ReportService implements IReportService {
         this.reportRepo = reportRepo;
     }
 
-    @Override
+    @Override //todo сделать нормаьный маппер и выделить отдельно его
     public void addReport(UserActionAuditParam userActionAuditParam) {
 
         ReportEntity reportEntity = new ReportEntity(UUID.randomUUID(),
                 LocalDateTime.now(),
                 LocalDateTime.now(),
                 ReportStatus.LOADED,
+                ReportType.JOURNAL_AUDIT,
                 FROM + userActionAuditParam.getFrom() + TO + userActionAuditParam.getTo(),
-                userActionAuditParam
+                userActionAuditParam.getUser(),
+                userActionAuditParam.getFrom(),
+                userActionAuditParam.getTo()
         );
         reportRepo.save(reportEntity);
     }
@@ -53,13 +56,12 @@ public class ReportService implements IReportService {
                         elem.getUpdateDate(),
                         elem.getStatus(),
                         elem.getDescription(),
-                        elem.getParam())).toList());
+                        new UserActionAuditParam(elem.getUser(), elem.getFrom(), elem.getTo()))).toList());
     }
 
     @Override
     public boolean exist(UUID uuid) {
-        ReportEntity reportEntity = reportRepo.getById(uuid);
-        return reportEntity != null;
+        return reportRepo.existsById(uuid);
     }
 
     @Override

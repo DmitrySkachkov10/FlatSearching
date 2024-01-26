@@ -2,11 +2,10 @@ package by.skachkovdmitry.audit.repository.entity;
 
 import by.skachkovdmitry.audit.core.dto.UserActionAuditParam;
 import by.skachkovdmitry.audit.core.enums.ReportStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import by.skachkovdmitry.audit.core.enums.ReportType;
+import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -28,9 +27,15 @@ public class ReportEntity {
 
     private ReportStatus status;
 
-    private final String type = "JOURNAL_AUDIT";
+    @Enumerated(EnumType.STRING)
+    private ReportType type;
 
     private String description;
 
-    private UserActionAuditParam param;
+
+    private String user;
+
+    private String from;
+
+    private String to;
 }

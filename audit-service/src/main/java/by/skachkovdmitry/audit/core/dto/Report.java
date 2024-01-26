@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class Report {
+
     private String uuid;
 
     private LocalDateTime dt_create;

@@ -31,14 +31,14 @@ public class AuditService implements IAuditService {
     @Override
     public void save(LogInfo logInfo) {
 
-            auditRepo.save(new AuditEntity(UUID.randomUUID(),
-                    LocalDateTime.now(),
-                    dtoUserToEntityMapper.mapDtoToEntity(logInfo.getUser()),
-                    logInfo.getText(),
-                    EssenceType.valueOf(logInfo.getEssenceType()),
-                    logInfo.getId()));
+        auditRepo.save(new AuditEntity(UUID.randomUUID(),
+                LocalDateTime.now(),
+                dtoUserToEntityMapper.mapDtoToEntity(logInfo.getUser()), //todo может быть null решить этот вопрос
+                logInfo.getText(),
+                EssenceType.valueOf(logInfo.getEssenceType()),
+                logInfo.getId()));
 
-            System.out.println("аудит добавлен в базу");
+        System.out.println("аудит добавлен в базу");
 
     }
 

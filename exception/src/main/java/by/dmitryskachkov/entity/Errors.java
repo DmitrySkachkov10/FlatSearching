@@ -2,9 +2,8 @@ package by.dmitryskachkov.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Errors<T extends Error> {
+public class Errors<T extends Error>  {
     List<T> errorList = new ArrayList<>();
-
 
     public void add(T e) {
         this.errorList.add(e);

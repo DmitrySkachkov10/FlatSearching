@@ -24,8 +24,7 @@ public class DtoUserToEntityMapper {
                     user.getMail(),
                     user.getFio(),
                     Roles.valueOf(user.getRole()));
-        } else {
-            return new UserEntity(UUID.randomUUID(), "no-mail", "no-fio", null);
         }
+        return null;
     }
 }

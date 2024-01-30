@@ -9,6 +9,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 
@@ -31,6 +33,7 @@ public class MailService implements IMailService {
 
     @Override
     @Scheduled(fixedDelay = 30000)
+    @Transactional
     public void send() {
 
         List<MailVerifyEntity> mailVerifyEntities = mailRepo.findAllBySend(false);

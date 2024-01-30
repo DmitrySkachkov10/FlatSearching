@@ -50,6 +50,7 @@ public class SecurityConfig {
                 });
 
         http.authorizeRequests(requests -> requests
+                .requestMatchers("/audit/upload").access("hasIpAddress('127.0.0.1') or hasIpAddress('localhost')")
                 .anyRequest().hasRole("ADMIN")
         );
 

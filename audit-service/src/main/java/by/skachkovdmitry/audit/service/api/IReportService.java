@@ -11,7 +11,7 @@ public interface IReportService {
 
     PageOfReport getReports(Pageable pageable);
 
-    boolean exist(UUID uuid);
+    boolean exist(UUID id);
 
     InputStreamResource download(UUID uuid);
 }

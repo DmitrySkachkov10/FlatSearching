@@ -21,7 +21,7 @@ public class ReportController {
     }
 
     @PostMapping("/{type}")
-    public ResponseEntity<String> addReport(@PathVariable ReportType type,
+    public ResponseEntity<String> addReport(@PathVariable("type") String type,
                                             @RequestBody UserActionAuditParam userActionAuditParam) {
         reportService.addReport(userActionAuditParam);
         return new ResponseEntity<>("Отчёт запущен", HttpStatus.ACCEPTED);
@@ -40,6 +40,7 @@ public class ReportController {
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_GATEWAY);
         }
+
     }
 
 //    @GetMapping("/{uuid}/export")

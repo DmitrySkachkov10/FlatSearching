@@ -5,14 +5,17 @@ import by.skachkovdmitry.audit.core.dto.Report;
 import by.skachkovdmitry.audit.core.dto.UserActionAuditParam;
 import by.skachkovdmitry.audit.core.enums.ReportStatus;
 import by.skachkovdmitry.audit.core.enums.ReportType;
+import by.skachkovdmitry.audit.core.utils.ExcelFileMaker;
 import by.skachkovdmitry.audit.repository.api.IReportRepo;
 import by.skachkovdmitry.audit.repository.entity.ReportEntity;
+import by.skachkovdmitry.audit.service.api.IAuditService;
 import by.skachkovdmitry.audit.service.api.IReportService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -23,29 +26,39 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ReportService implements IReportService {
     private final IReportRepo reportRepo;
 
+    private final ExcelFileMaker excelFileMaker;
+    private final IAuditService auditService;
     private final Lock lock = new ReentrantLock();
     private final String FROM = "from: ";
     private final String TO = " to: ";
+    //todo normal final TO FROM????
 
-    public ReportService(IReportRepo reportRepo) {
+    public ReportService(IReportRepo reportRepo, IAuditService auditService, ExcelFileMaker excelFileMaker) {
         this.reportRepo = reportRepo;
+        this.auditService = auditService;
+        this.excelFileMaker = excelFileMaker;
     }
 
     @Override //todo сделать нормаьный маппер и выделить отдельно его
+    @Transactional
     public void addReport(UserActionAuditParam userActionAuditParam) {
 
-        ReportEntity reportEntity = new ReportEntity(UUID.randomUUID(),
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                ReportStatus.LOADED,
-                ReportType.JOURNAL_AUDIT,
-                FROM + userActionAuditParam.getFrom() + TO + userActionAuditParam.getTo(),
-                userActionAuditParam.getUser(),
-                userActionAuditParam.getFrom(),
-                userActionAuditParam.getTo()
-        );
-        reportRepo.save(reportEntity);
-        create(reportEntity.getUuid());
+        if (!reportRepo.existsByUserUuidAndFromDateAndToDate(userActionAuditParam.getUser(), userActionAuditParam.getFrom(), userActionAuditParam.getTo())){
+            ReportEntity reportEntity = new ReportEntity(UUID.randomUUID(),
+                    LocalDateTime.now(),
+                    LocalDateTime.now(),
+                    ReportStatus.LOADED,
+                    ReportType.JOURNAL_AUDIT,
+                    FROM + userActionAuditParam.getFrom() + TO + userActionAuditParam.getTo(),
+                    userActionAuditParam.getUser(),
+                    userActionAuditParam.getFrom(),
+                    userActionAuditParam.getTo()
+            );
+            reportRepo.saveAndFlush(reportEntity);
+            create(reportEntity);
+        } else {
+            //todo valid exception
+        }
     }
 
     @Override
@@ -64,32 +77,44 @@ public class ReportService implements IReportService {
                         elem.getUpdateDate(),
                         elem.getStatus(),
                         elem.getDescription(),
-                        new UserActionAuditParam(elem.getUser(), elem.getFrom(), elem.getTo()))).toList());
+                        new UserActionAuditParam(elem.getUserUuid(), elem.getFromDate(), elem.getToDate()))).toList());
     }
 
     @Override
-    public boolean exist(UUID uuid) {
-        return reportRepo.existsById(uuid);  //todo нужно брать статус из базы в не отчет(мы же будем качать файл)
+    public boolean exist(UUID id) {
+        ReportEntity report = reportRepo.findById(id).orElse(null);
+        return report != null && report.getStatus().equals(ReportStatus.DONE);
     }
 
     @Override
     public InputStreamResource download(UUID uuid) {
-        return null;
+        return null;//todo make return file)
     }
 
     @Async
-    private void create(UUID uuid) {
+    @Transactional
+    //todo log нормальный и aop
+    private void create(ReportEntity reportEntity) {
 
-        ReportEntity existingReport = reportRepo.getReferenceById(uuid);
-        if (existingReport.getStatus().equals(ReportStatus.LOADED)) {
-            try {
-                lock.lock();
-                existingReport.setStatus(ReportStatus.PROGRESS);
-                reportRepo.saveAndFlush(existingReport);
-            } finally {
-                lock.unlock();
-                //todo создание файла самого
+        boolean shouldMakeFile = false;
+        try {
+            lock.lock();
+            if (reportEntity.getStatus().equals(ReportStatus.LOADED)) {
+                reportEntity.setStatus(ReportStatus.PROGRESS);
+                reportRepo.saveAndFlush(reportEntity);
+                shouldMakeFile = true;
             }
+        } finally {
+            lock.unlock();
+        }
+
+        if (shouldMakeFile) {
+            excelFileMaker.setFileName(reportEntity.getUuid().toString());
+            excelFileMaker.createFile(auditService.getAuditsForUserBetweenDates(reportEntity.getUserUuid(),
+                    reportEntity.getFromDate(),
+                    reportEntity.getToDate()));
+            reportEntity.setStatus(ReportStatus.DONE);
+            reportRepo.saveAndFlush(reportEntity);
         }
     }
 }

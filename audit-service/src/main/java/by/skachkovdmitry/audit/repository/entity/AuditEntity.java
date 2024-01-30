@@ -15,7 +15,7 @@ public class AuditEntity {
     private UUID uuid;
 
     @Column(name = "dt_create")
-    private LocalDateTime dtCreate;
+    private LocalDateTime createDate;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_uuid")
@@ -32,9 +32,9 @@ public class AuditEntity {
     public AuditEntity() {
     }
 
-    public AuditEntity(UUID uuid, LocalDateTime dtCreate, UserEntity user, String text, EssenceType essenceType, String id) {
+    public AuditEntity(UUID uuid, LocalDateTime createDate, UserEntity user, String text, EssenceType essenceType, String id) {
         this.uuid = uuid;
-        this.dtCreate = dtCreate;
+        this.createDate = createDate;
         this.user = user;
         this.text = text;
         this.essenceType = essenceType;
@@ -49,12 +49,12 @@ public class AuditEntity {
         this.uuid = uuid;
     }
 
-    public LocalDateTime getDt_create() {
-        return dtCreate;
+    public LocalDateTime getCreateDate() {
+        return createDate;
     }
 
-    public void setDt_create(LocalDateTime dtCreate) {
-        this.dtCreate = dtCreate;
+    public void setCreateDate(LocalDateTime createDate) {
+        this.createDate = createDate;
     }
 
     public UserEntity getUser() {
@@ -91,14 +91,13 @@ public class AuditEntity {
 
     @Override
     public boolean equals(Object o) {
-
         if (this == o) return true;
-        if (!(o instanceof AuditEntity that)) return false;
-        return dtCreate == that.dtCreate && Objects.equals(uuid, that.uuid)  && Objects.equals(text, that.text) && essenceType == that.essenceType && Objects.equals(id, that.id);
+        if (!(o instanceof AuditEntity audit)) return false;
+        return Objects.equals(uuid, audit.uuid) && Objects.equals(createDate, audit.createDate) && Objects.equals(text, audit.text) && essenceType == audit.essenceType && Objects.equals(id, audit.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid, dtCreate, text, essenceType, id);
+        return Objects.hash(uuid, createDate, text, essenceType, id);
     }
 }

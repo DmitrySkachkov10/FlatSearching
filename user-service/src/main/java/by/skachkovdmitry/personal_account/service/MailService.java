@@ -4,6 +4,7 @@ import by.skachkovdmitry.personal_account.repo.api.IMailRepo;
 import by.skachkovdmitry.personal_account.repo.entity.MailVerifyEntity;
 import by.skachkovdmitry.personal_account.service.api.IMailService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -22,6 +23,7 @@ public class MailService implements IMailService {
     }
 
     @Override
+    @Transactional
     public void create(String mail) {
         MailVerifyEntity mailVerifyEntity = new MailVerifyEntity();
         mailVerifyEntity.setMail(mail);

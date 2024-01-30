@@ -31,5 +31,4 @@ public class AuditController {
     public ResponseEntity<Audit> getByUuid(@PathVariable UUID uuid) {
         return new ResponseEntity<>(auditService.getAudit(uuid), HttpStatusCode.valueOf(200));
     }
-
 }

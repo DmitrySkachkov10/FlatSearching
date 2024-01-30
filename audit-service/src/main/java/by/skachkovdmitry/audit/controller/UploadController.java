@@ -1,10 +1,8 @@
 package by.skachkovdmitry.audit.controller;
 
-
 import by.skachkovdmitry.audit.core.dto.LogInfo;
 import by.skachkovdmitry.audit.service.api.IAuditService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

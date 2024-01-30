@@ -8,10 +8,10 @@ import by.skachkovdmitry.personal_account.core.status.Status;
 import by.skachkovdmitry.personal_account.repo.api.IUserRepo;
 import by.skachkovdmitry.personal_account.repo.entity.UserEntity;
 import by.skachkovdmitry.personal_account.service.api.IUserService;
-import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,7 +30,6 @@ public class UserService implements IUserService {
     public UserEntity getUserByMail(String mail) {
         UserEntity userEntity = userRepo.findByMail(mail)
                 .orElse(null);
-
         if (userEntity != null) {
             return userEntity;
         } else {

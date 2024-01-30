@@ -11,7 +11,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.aspectj.lang.annotation.Aspect;
 
-
 @Aspect
 @Component
 public class UserAspect {
@@ -46,8 +45,10 @@ public class UserAspect {
                     .getAuthentication()
                     .getPrincipal());
             logService.send(logInfo);
+            System.out.println("zzzzzdfsa32");
             return result;
         } catch (Error e) {
+            System.out.println("u=uada " + e.getMessage());
             logInfo.setText("Ошибка в " + action + ": " + e.getMessage());
             logService.send(logInfo);
             throw e;

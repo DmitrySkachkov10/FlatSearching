@@ -1,6 +1,14 @@
 package by.skachkovdmitry.audit.core.dto;
 
+import by.skachkovdmitry.audit.config.properies.LocalDateTimeUnixTimestampSerializer;
+import by.skachkovdmitry.audit.config.properies.UnixTimestampToLocalDateTimeDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -8,9 +16,13 @@ import lombok.*;
 @EqualsAndHashCode
 public class UserActionAuditParam {
 
-    private String user;
+    private UUID user;
 
-    private String from;
+    @JsonSerialize(using = LocalDateTimeUnixTimestampSerializer.class)
+    @JsonDeserialize(using = UnixTimestampToLocalDateTimeDeserializer.class)
+    private LocalDateTime from;
 
-    private String to;
+    @JsonSerialize(using = LocalDateTimeUnixTimestampSerializer.class)
+    @JsonDeserialize(using = UnixTimestampToLocalDateTimeDeserializer.class)
+    private LocalDateTime to;
 }

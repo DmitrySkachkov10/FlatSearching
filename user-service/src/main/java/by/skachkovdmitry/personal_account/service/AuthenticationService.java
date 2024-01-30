@@ -13,9 +13,9 @@ import by.skachkovdmitry.personal_account.repo.entity.UserEntity;
 import by.skachkovdmitry.personal_account.service.api.IAuthenticationService;
 import by.skachkovdmitry.personal_account.service.api.IMailService;
 import by.skachkovdmitry.personal_account.service.api.IUserService;
-import jakarta.transaction.Transactional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -61,8 +61,9 @@ public class AuthenticationService implements IAuthenticationService {
                 user.getRole()));
     }
 
-    @Transactional
+
     @Override
+    @Transactional
     public void register(UserRegistration userRegistration) {
         isValidData(userRegistration);
 

@@ -9,16 +9,17 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class FeignClientConfiguration {
 
-    @Value("${your.token.value}")
-    private String token;
+//    @Value("${your.token.value}")
+//    private String token;
     @Bean
     public RequestInterceptor requestInterceptor() {
         return new RequestInterceptor() {
             @Override
             public void apply(RequestTemplate template) {
-                // Добавление токена в хэдер запроса
-                template.header("Authorization", "Bearer " + token);
+//                // Добавление токена в хэдер запроса
+//                template.header("Authorization", "Bearer " + token);
             }
         };
     }
 }
+

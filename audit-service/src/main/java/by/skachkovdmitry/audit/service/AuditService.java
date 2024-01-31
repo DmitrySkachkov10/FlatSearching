@@ -1,5 +1,6 @@
 package by.skachkovdmitry.audit.service;
 
+import by.dmitryskachkov.entity.ValidationError;
 import by.skachkovdmitry.audit.core.enums.EssenceType;
 import by.skachkovdmitry.audit.core.mapper.DtoUserToEntityMapper;
 import by.skachkovdmitry.audit.core.dto.Audit;
@@ -8,6 +9,8 @@ import by.skachkovdmitry.audit.core.dto.PageOfAudit;
 import by.skachkovdmitry.audit.repository.api.IAuditRepo;
 import by.skachkovdmitry.audit.repository.entity.AuditEntity;
 import by.skachkovdmitry.audit.service.api.IAuditService;
+import lombok.extern.slf4j.Slf4j;
+import org.aspectj.util.Reflection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class AuditService implements IAuditService {
 
     private final IAuditRepo auditRepo;
@@ -33,7 +37,6 @@ public class AuditService implements IAuditService {
     @Override
     @Transactional
     public void save(LogInfo logInfo) {
-
         auditRepo.save(new AuditEntity(UUID.randomUUID(),
                 LocalDateTime.now(),
                 dtoUserToEntityMapper.mapDtoToEntity(logInfo.getUser()), //todo может быть null решить этот вопрос
@@ -41,8 +44,7 @@ public class AuditService implements IAuditService {
                 EssenceType.valueOf(logInfo.getEssenceType()),
                 logInfo.getId()));
 
-        System.out.println("аудит добавлен в базу");
-
+        log.info("аудит добавлен в базу");
     }
 
     @Override
@@ -54,6 +56,7 @@ public class AuditService implements IAuditService {
                 auditEntity.getText(),
                 auditEntity.getEssenceType(),
                 auditEntity.getId());
+
     }
 
     @Override
@@ -80,8 +83,12 @@ public class AuditService implements IAuditService {
         return page;
     }
 
-    @Override
+    @Override//можно через aop тут удобно будте
     public List<AuditEntity> getAuditsForUserBetweenDates(UUID userUuid, LocalDateTime startDate, LocalDateTime endDate) {
-        return auditRepo.findAuditsForUserBetweenDates(userUuid, startDate, endDate);
+        try {
+            return auditRepo.findAuditsForUserBetweenDates(userUuid, startDate, endDate);
+        } catch (Exception e){
+            throw new ValidationError("Неверный формат 'from' or 'to'");
+        }
     }
 }

@@ -3,6 +3,7 @@ package by.skachkovdmitry.mailing_service.service;
 import by.skachkovdmitry.mailing_service.repo.api.IMailRepo;
 import by.skachkovdmitry.mailing_service.repo.entity.MailVerifyEntity;
 import by.skachkovdmitry.mailing_service.service.api.IMailService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Service
 @EnableScheduling
+@Slf4j
 public class MailService implements IMailService {
 
     @Value("${my.verificationPass}")
@@ -38,18 +40,21 @@ public class MailService implements IMailService {
 
         List<MailVerifyEntity> mailVerifyEntities = mailRepo.findAllBySend(false);
 
-        mailVerifyEntities.forEach(elem -> {
+        if (!mailVerifyEntities.isEmpty()){
+            mailVerifyEntities.forEach(elem -> {
 
-            message = new SimpleMailMessage();
+                message = new SimpleMailMessage();
 
-            message.setTo(elem.getMail());
-            message.setSubject("Verification code");
-            message.setText(verificationPass + "?" + "code=" + elem.getCode() + "&" + "mail=" + elem.getMail());
-            javaMailSender.send(message);
+                message.setTo(elem.getMail());
+                message.setSubject("Verification code");
+                message.setText(verificationPass + "?" + "code=" + elem.getCode() + "&" + "mail=" + elem.getMail());
+                javaMailSender.send(message);
 
-            elem.setSend(true);
-            mailRepo.save(elem);
-        });
+                elem.setSend(true);
+                mailRepo.save(elem);
+            });
+            log.info("Отправка на почту");
+        }
     }
 
 

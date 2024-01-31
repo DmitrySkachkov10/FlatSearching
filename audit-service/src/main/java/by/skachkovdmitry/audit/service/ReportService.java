@@ -1,5 +1,6 @@
 package by.skachkovdmitry.audit.service;
 
+import by.dmitryskachkov.entity.ValidationError;
 import by.skachkovdmitry.audit.core.dto.PageOfReport;
 import by.skachkovdmitry.audit.core.dto.Report;
 import by.skachkovdmitry.audit.core.dto.UserActionAuditParam;
@@ -10,6 +11,7 @@ import by.skachkovdmitry.audit.repository.api.IReportRepo;
 import by.skachkovdmitry.audit.repository.entity.ReportEntity;
 import by.skachkovdmitry.audit.service.api.IAuditService;
 import by.skachkovdmitry.audit.service.api.IReportService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +25,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Service
+@Slf4j
 public class ReportService implements IReportService {
     private final IReportRepo reportRepo;
 
@@ -43,7 +46,7 @@ public class ReportService implements IReportService {
     @Transactional
     public void addReport(UserActionAuditParam userActionAuditParam) {
 
-        if (!reportRepo.existsByUserUuidAndFromDateAndToDate(userActionAuditParam.getUser(), userActionAuditParam.getFrom(), userActionAuditParam.getTo())){
+        if (!reportRepo.existsByUserUuidAndFromDateAndToDate(userActionAuditParam.getUser(), userActionAuditParam.getFrom(), userActionAuditParam.getTo())) {
             ReportEntity reportEntity = new ReportEntity(UUID.randomUUID(),
                     LocalDateTime.now(),
                     LocalDateTime.now(),
@@ -55,9 +58,10 @@ public class ReportService implements IReportService {
                     userActionAuditParam.getTo()
             );
             reportRepo.saveAndFlush(reportEntity);
+            log.info("Запуск создания отчета" + LocalDateTime.now());
             create(reportEntity);
         } else {
-            //todo valid exception
+           throw new ValidationError("Данный отчет уже создан");
         }
     }
 
@@ -93,9 +97,7 @@ public class ReportService implements IReportService {
 
     @Async
     @Transactional
-    //todo log нормальный и aop
     private void create(ReportEntity reportEntity) {
-
         boolean shouldMakeFile = false;
         try {
             lock.lock();
@@ -115,6 +117,7 @@ public class ReportService implements IReportService {
                     reportEntity.getToDate()));
             reportEntity.setStatus(ReportStatus.DONE);
             reportRepo.saveAndFlush(reportEntity);
+            log.info("Отчет создан" + LocalDateTime.now());
         }
     }
 }

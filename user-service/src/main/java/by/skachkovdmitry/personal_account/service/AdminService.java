@@ -33,12 +33,13 @@ public class AdminService implements IAdminService {
     public void create(UserCreate userCreate) {
 
         UserEntity userEntity = new UserEntity();
+        userEntity.setUuid(UUID.randomUUID());
         userEntity.setMail(userCreate.getMail());
         userEntity.setPassword(userCreate.getPassword());
         userEntity.setFio(userCreate.getFio());
 
         userEntity.setRole(Roles.valueOf(userCreate.getRole()));
-        userEntity.setStatus(Status.valueOf(userCreate.getRole()));
+        userEntity.setStatus(Status.valueOf(userCreate.getStatus()));
 
         userEntity.setDtCreate(LocalDateTime.now());
         userEntity.setDtUpdate(userEntity.getDtCreate());

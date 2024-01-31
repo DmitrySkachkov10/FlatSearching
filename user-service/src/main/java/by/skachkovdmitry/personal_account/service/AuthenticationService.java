@@ -6,6 +6,7 @@ import by.skachkovdmitry.personal_account.core.dto.UserRegistration;
 import by.skachkovdmitry.personal_account.core.dto.security.UserSecurity;
 import by.skachkovdmitry.personal_account.core.dto.verification.MailVerifyDTO;
 import by.dmitryskachkov.entity.*;
+import by.skachkovdmitry.personal_account.core.role.Roles;
 import by.skachkovdmitry.personal_account.core.status.Status;
 import by.skachkovdmitry.personal_account.core.utils.JwtTokenHandler;
 import by.skachkovdmitry.personal_account.repo.entity.MailVerifyEntity;
@@ -75,6 +76,8 @@ public class AuthenticationService implements IAuthenticationService {
         userEntity.setUuid(UUID.randomUUID());
         userEntity.setDtCreate(LocalDateTime.now());
         userEntity.setDtUpdate(userEntity.getDtCreate());
+        userEntity.setRole(Roles.USER);
+        userEntity.setStatus(Status.WAITING_ACTIVATION);
 
         userService.save(userEntity);
         mailService.create(userRegistration.getMail());

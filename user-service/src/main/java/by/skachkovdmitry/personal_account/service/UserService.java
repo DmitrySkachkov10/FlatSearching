@@ -49,18 +49,7 @@ public class UserService implements IUserService {
         }
 
         System.out.println(userEntity.getRole() + " " + userEntity.getStatus());
-        if (userEntity.getStatus() == null) {
-            userEntity.setRole(Roles.USER);
-        }
-        if (userEntity.getStatus() == null) {
-            userEntity.setStatus(Status.WAITING_ACTIVATION);
-        }
-
-        //try {
         userRepo.save(userEntity);
-//        } catch (Exception e) {
-//            throw new DatabaseError("Проблема в системе обратитеь к администратору");
-//        }
     }
 
 

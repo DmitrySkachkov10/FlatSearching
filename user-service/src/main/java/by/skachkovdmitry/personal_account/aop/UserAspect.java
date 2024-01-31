@@ -4,6 +4,7 @@ import by.dmitryskachkov.entity.Error;
 import by.skachkovdmitry.personal_account.core.dto.LogInfo;
 import by.skachkovdmitry.personal_account.core.dto.security.UserSecurity;
 import by.skachkovdmitry.personal_account.service.api.feign.LogService;
+import feign.RetryableException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
@@ -23,35 +24,49 @@ public class UserAspect {
 
     @Around("execution(* by.skachkovdmitry.personal_account.service.AuthenticationService.logIn(..))")
     public Object login(ProceedingJoinPoint joinPoint) throws Throwable {
-        return handleMethod(joinPoint, "Пользователь вошел в систему");
-    }
-
-    @Around("execution(* by.skachkovdmitry.personal_account.service.AuthenticationService.myInfo(..))")
-    public Object userInfo(ProceedingJoinPoint joinPoint) throws Throwable {
-        return handleMethod(joinPoint, "Получение информации в профиле");
-    }
-
-    private Object handleMethod(ProceedingJoinPoint joinPoint, String action) throws Throwable {
         Signature signature = joinPoint.getSignature();
         LogInfo logInfo = new LogInfo();
         logInfo.setEssenceType("USER");
         logInfo.setId(signature.getName());
-        logInfo.setUser(null);
+
+        Object result = joinPoint.proceed();
+        logInfo.setText("Пользователь вошел в систему");
+        logInfo.setUser((UserSecurity) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal());
+        send(logInfo);
+        return result;
+    }
+
+    @Around("execution(* by.skachkovdmitry.personal_account.service.AuthenticationService.myInfo(..))")
+    public Object userInfo(ProceedingJoinPoint joinPoint) throws Throwable {
+        Signature signature = joinPoint.getSignature();
+        LogInfo logInfo = new LogInfo();
+        logInfo.setEssenceType("USER");
+        logInfo.setId(signature.getName());
         try {
             Object result = joinPoint.proceed();
-            logInfo.setText(action);
+            logInfo.setText("Получение информации в профиле");
             logInfo.setUser((UserSecurity) SecurityContextHolder
                     .getContext()
                     .getAuthentication()
                     .getPrincipal());
-            logService.send(logInfo);
-            System.out.println("zzzzzdfsa32");
+            send(logInfo);
             return result;
         } catch (Error e) {
-            System.out.println("u=uada " + e.getMessage());
-            logInfo.setText("Ошибка в " + action + ": " + e.getMessage());
-            logService.send(logInfo);
+            logInfo.setText("Ошибка в " + "Получение информации в профиле" + ": " + e.getMessage());
+            send(logInfo);
             throw e;
+        }
+    }
+
+
+    private void send(LogInfo logInfo) {
+        try {
+            logService.send(logInfo);
+        } catch (RetryableException e) {
+            System.out.println("лог не будет");
         }
     }
 

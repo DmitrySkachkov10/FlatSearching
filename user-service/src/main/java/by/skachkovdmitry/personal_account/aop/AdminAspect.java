@@ -4,6 +4,7 @@ import by.dmitryskachkov.entity.Error;
 import by.skachkovdmitry.personal_account.core.dto.LogInfo;
 import by.skachkovdmitry.personal_account.core.dto.security.UserSecurity;
 import by.skachkovdmitry.personal_account.service.api.feign.LogService;
+import feign.RetryableException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
@@ -61,14 +62,21 @@ public class AdminAspect {
         try {
             Object result = joinPoint.proceed();
             logInfo.setText(action);
-            logService.send(logInfo);
+            send(logInfo);
             return result;
         } catch (Error e) {
             logInfo.setText("Ошибка в " + action + ": " + e.getMessage());
-            logService.send(logInfo);
+            send(logInfo);
             throw e;
         }
     }
 
 
+    private void send(LogInfo logInfo) {
+        try {
+            logService.send(logInfo);
+        }catch (RetryableException e) {
+            System.out.println("нет подключение логгирования не будет");
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package by.skachkovdmitry.personal_account.core.filter;
 
+import by.dmitryskachkov.entity.TokenError;
 import by.skachkovdmitry.personal_account.core.dto.security.UserSecurity;
 import by.skachkovdmitry.personal_account.core.utils.JwtTokenHandler;
 import jakarta.servlet.FilterChain;
@@ -7,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -41,25 +43,37 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // Get jwt token and validate
         final String token = header.split(" ")[1].trim();
-        if (!jwtHandler.validate(token)) {
+        try {
+            if (!jwtHandler.validate(token)) {
+                chain.doFilter(request, response);
+                return;
+            }
+
+            UserSecurity userSecurity = jwtHandler.getUser(token);
+
+            UsernamePasswordAuthenticationToken
+                    authentication = new UsernamePasswordAuthenticationToken(
+                    userSecurity, null,
+                    userSecurity == null ?
+                            List.of() : userSecurity.getAuthorities()
+            );
+
+            authentication.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request)
+            );
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             chain.doFilter(request, response);
-            return;
+        } catch (TokenError e) {
+            handleVerificationError(response, e);
         }
+    }
 
-        UserSecurity userSecurity = jwtHandler.getUser(token);
-
-        UsernamePasswordAuthenticationToken
-                authentication = new UsernamePasswordAuthenticationToken(
-                userSecurity, null,
-                userSecurity == null ?
-                        List.of() : userSecurity.getAuthorities()
-        );
-
-        authentication.setDetails(
-                new WebAuthenticationDetailsSource().buildDetails(request)
-        );
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        chain.doFilter(request, response);
+    private void handleVerificationError(HttpServletResponse response, TokenError e) throws IOException {
+        response.setStatus(e.getHttpStatusCode().value());
+        response.setContentType("application/json");
+        String jsonError = "{\"error\": \"" + e.getMessage() + "\"}";
+        response.getWriter().write(jsonError);
+        response.getWriter().flush();
     }
 }

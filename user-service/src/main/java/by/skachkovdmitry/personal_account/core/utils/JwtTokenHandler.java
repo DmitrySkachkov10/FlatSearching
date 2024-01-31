@@ -1,12 +1,13 @@
 package by.skachkovdmitry.personal_account.core.utils;
 
+import by.dmitryskachkov.entity.TokenError;
 import by.dmitryskachkov.entity.VerificationError;
 import by.skachkovdmitry.personal_account.config.properties.JWTProperty;
 import by.skachkovdmitry.personal_account.core.dto.security.UserSecurity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -78,20 +79,25 @@ public class JwtTokenHandler {
             Jwts.parser().setSigningKey(property.getSecret()).parseClaimsJws(token);
             return true;
         } catch (SignatureException ex) {
-            throw new VerificationError("ошибка доступа1");
-            //logger.error("Invalid JWT signature - {}", ex.getMessage());
+            TokenError error = new TokenError("Invalid JWT signature");
+            error.setHttpStatusCode(HttpStatus.UNAUTHORIZED);
+            throw error;
         } catch (MalformedJwtException ex) {
-            throw new VerificationError("ошибка доступа2");
-            //logger.error("Invalid JWT token - {}", ex.getMessage());
+            TokenError error = new TokenError("Invalid JWT token");
+            error.setHttpStatusCode(HttpStatus.UNAUTHORIZED);
+            throw error;
         } catch (ExpiredJwtException ex) {
-            throw new VerificationError("ошибка доступа3");
-            //logger.error("Expired JWT token - {}", ex.getMessage());
+            TokenError error = new TokenError("Expired JWT token");
+            error.setHttpStatusCode(HttpStatus.FORBIDDEN);
+            throw error;
         } catch (UnsupportedJwtException ex) {
-            throw new VerificationError("ошибка доступа4");
-            //logger.error("Unsupported JWT token - {}", ex.getMessage());
+            TokenError error = new TokenError("Unsupported JWT token");
+            error.setHttpStatusCode(HttpStatus.UNAUTHORIZED);
+            throw error;
         } catch (IllegalArgumentException ex) {
-            throw new VerificationError("ошибка доступа5");
-            //logger.error("JWT claims string is empty - {}", ex.getMessage());
+            TokenError error = new TokenError("JWT claims string is empty");
+            error.setHttpStatusCode(HttpStatus.BAD_REQUEST);
+            throw error;
         }
     }
 }

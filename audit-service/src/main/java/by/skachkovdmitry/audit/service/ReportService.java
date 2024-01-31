@@ -18,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.concurrent.locks.Lock;
@@ -117,7 +116,6 @@ public class ReportService implements IReportService {
                     reportEntity.getToDate()));
             reportEntity.setStatus(ReportStatus.DONE);
             reportRepo.saveAndFlush(reportEntity);
-            log.info("Отчет создан" + LocalDateTime.now());
         }
     }
 }

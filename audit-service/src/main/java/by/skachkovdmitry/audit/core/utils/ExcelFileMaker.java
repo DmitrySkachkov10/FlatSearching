@@ -1,6 +1,7 @@
 package by.skachkovdmitry.audit.core.utils;
 
 import by.skachkovdmitry.audit.repository.entity.AuditEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
@@ -9,17 +10,16 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
+@Slf4j
 public class ExcelFileMaker {
 
     private String fileName;
 
+    private final String DIR = "./audit-service/reports/";
     private final String EXTENSION = ".xlsx";
     public ExcelFileMaker() {
     }
 
-    public ExcelFileMaker(String fileName) {
-        this.fileName = fileName;
-    }
 
     public void createFile(List<AuditEntity> auditEntityList) {
 
@@ -34,7 +34,6 @@ public class ExcelFileMaker {
 
         int rowNum = 1;
         for (AuditEntity audit : auditEntityList){
-            System.out.println(audit.getId());
             Row row = sheet.createRow(rowNum++);
             row.createCell(0).setCellValue(audit.getUuid().toString());
             row.createCell(1).setCellValue(audit.getCreateDate().toString());
@@ -48,11 +47,11 @@ public class ExcelFileMaker {
         }
 
 
-        try (FileOutputStream fileOut = new FileOutputStream(fileName + EXTENSION)) {
+        try (FileOutputStream fileOut = new FileOutputStream(DIR + fileName + EXTENSION)) {
             workbook.write(fileOut);
-            System.out.println("Excel файл успешно сохранен локально: " + "first");
+            log.info("Файл успешно создан с именем - " + fileName);
         } catch (IOException e) {
-            System.out.println("Ошибка при сохранении Excel файла: " + e.getMessage());
+            log.error("Ошибка в создании файла");
             e.printStackTrace();
         }
     }

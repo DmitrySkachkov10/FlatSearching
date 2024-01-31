@@ -1,10 +1,12 @@
 package by.skachkovdmitry.audit.core.utils;
 
+import by.dmitryskachkov.entity.TokenError;
 import by.skachkovdmitry.audit.config.properies.JWTProperty;
 import by.skachkovdmitry.audit.core.security.UserSecurity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -62,16 +64,25 @@ public class JwtTokenHandler {
             Jwts.parser().setSigningKey(property.getSecret()).parseClaimsJws(token);
             return true;
         } catch (SignatureException ex) {
-            //logger.error("Invalid JWT signature - {}", ex.getMessage());
+            TokenError error = new TokenError("Invalid JWT signature");
+            error.setHttpStatusCode(HttpStatus.UNAUTHORIZED);
+            throw error;
         } catch (MalformedJwtException ex) {
-            //logger.error("Invalid JWT token - {}", ex.getMessage());
+            TokenError error = new TokenError("Invalid JWT token");
+            error.setHttpStatusCode(HttpStatus.UNAUTHORIZED);
+            throw error;
         } catch (ExpiredJwtException ex) {
-            //logger.error("Expired JWT token - {}", ex.getMessage());
+            TokenError error = new TokenError("Expired JWT token");
+            error.setHttpStatusCode(HttpStatus.FORBIDDEN);
+            throw error;
         } catch (UnsupportedJwtException ex) {
-            //logger.error("Unsupported JWT token - {}", ex.getMessage());
+            TokenError error = new TokenError("Unsupported JWT token");
+            error.setHttpStatusCode(HttpStatus.UNAUTHORIZED);
+            throw error;
         } catch (IllegalArgumentException ex) {
-            //logger.error("JWT claims string is empty - {}", ex.getMessage());
+            TokenError error = new TokenError("JWT claims string is empty");
+            error.setHttpStatusCode(HttpStatus.BAD_REQUEST);
+            throw error;
         }
-        return false;
     }
 }

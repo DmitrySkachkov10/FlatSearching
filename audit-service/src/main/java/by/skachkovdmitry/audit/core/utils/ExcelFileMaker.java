@@ -4,6 +4,9 @@ import by.skachkovdmitry.audit.repository.entity.AuditEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.xmlbeans.ResourceLoader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,7 +18,9 @@ public class ExcelFileMaker {
 
     private String fileName;
 
-    private final String DIR = "./audit-service/reports/";
+    @Value("${app.reports.directory}")
+    private String DIRECTORY;
+
     private final String EXTENSION = ".xlsx";
     public ExcelFileMaker() {
     }
@@ -47,7 +52,7 @@ public class ExcelFileMaker {
         }
 
 
-        try (FileOutputStream fileOut = new FileOutputStream(DIR + fileName + EXTENSION)) {
+        try (FileOutputStream fileOut = new FileOutputStream(DIRECTORY + fileName + EXTENSION)) {
             workbook.write(fileOut);
             log.info("Файл успешно создан с именем - " + fileName);
         } catch (IOException e) {

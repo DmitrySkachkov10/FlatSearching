@@ -20,6 +20,7 @@ public class GlobalHandler {
 
     @ExceptionHandler(StructuredError.class)
     public ResponseEntity<StructuredErrorDto> defaultErrorHandler(StructuredError e) {
+
         StructuredErrorDto structuredErrorDto = new StructuredErrorDto();
         List<ErrorDto> errorDtos = e.getErrors().getErrorList().stream()
                 .map(er -> new ErrorDto(((Error) er).getMessage(), ((Error) er).getField()))

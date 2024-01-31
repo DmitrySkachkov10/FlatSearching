@@ -1,5 +1,6 @@
 package by.skachkovdmitry.personal_account.service;
 
+import by.dmitryskachkov.entity.ValidationError;
 import by.skachkovdmitry.personal_account.core.dto.PageOfUser;
 import by.skachkovdmitry.personal_account.core.dto.User;
 import by.skachkovdmitry.personal_account.core.dto.UserCreate;
@@ -78,7 +79,7 @@ public class AdminService implements IAdminService {
         System.out.println(latestUpdateTime + " " + lastUpdateTime);
 
         if (!latestUpdateTime.equals(lastUpdateTime)) {
-            throw new IllegalArgumentException("Файл уже редактировался");
+            throw new ValidationError("Файл уже редактировался");
         }
 
         userEntity.setFio(userCreate.getFio());
@@ -91,7 +92,7 @@ public class AdminService implements IAdminService {
         try {
             userService.update(userEntity);
         } catch (OptimisticEntityLockException e) {
-            throw new IllegalArgumentException("Докумнент уже редактировался");
+            throw new ValidationError("Файл уже редактировался");
         }
     }
 }

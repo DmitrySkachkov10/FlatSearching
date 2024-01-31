@@ -5,7 +5,7 @@ import by.skachkovdmitry.personal_account.core.dto.User;
 import by.skachkovdmitry.personal_account.core.dto.UserCreate;
 import by.skachkovdmitry.personal_account.service.api.IAdminService;
 import by.skachkovdmitry.personal_account.service.api.IAuthenticationService;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
@@ -26,18 +26,18 @@ public class AdminController {
     @PostMapping
     public ResponseEntity<String> create(@RequestBody UserCreate userCreate) {
         adminService.create(userCreate);
-        return new ResponseEntity<>("Пользователь создан", HttpStatusCode.valueOf(200));
+        return new ResponseEntity<>("Пользователь создан", HttpStatus.CREATED);
     }
 
 
     @GetMapping
     public ResponseEntity<PageOfUser> getUsers(@RequestParam int page, @RequestParam int size) {
-        return new ResponseEntity<>(adminService.getUserList(page, size), HttpStatusCode.valueOf(200));
+        return new ResponseEntity<>(adminService.getUserList(page, size), HttpStatus.OK);
     }
 
     @GetMapping("/{uuid}")
     public ResponseEntity<User> getUserByUuid(@PathVariable UUID uuid) {
-        return new ResponseEntity<>(adminService.getUser(uuid), HttpStatusCode.valueOf(200));
+        return new ResponseEntity<>(adminService.getUser(uuid),  HttpStatus.OK);
     }
 
 
@@ -48,6 +48,6 @@ public class AdminController {
 
 
         adminService.update(userCreate, uuid, dt_update);
-        return new ResponseEntity<>("Обновлен", HttpStatusCode.valueOf(200));
+        return new ResponseEntity<>("Обновлен",  HttpStatus.OK);
     }
 }

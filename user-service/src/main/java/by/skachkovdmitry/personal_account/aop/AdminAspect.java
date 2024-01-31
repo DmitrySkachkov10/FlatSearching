@@ -5,6 +5,7 @@ import by.skachkovdmitry.personal_account.core.dto.LogInfo;
 import by.skachkovdmitry.personal_account.core.dto.security.UserSecurity;
 import by.skachkovdmitry.personal_account.service.api.feign.LogService;
 import feign.RetryableException;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
+@Slf4j
 public class AdminAspect {
     private final LogService logService;
 
@@ -76,7 +78,7 @@ public class AdminAspect {
         try {
             logService.send(logInfo);
         }catch (RetryableException e) {
-            System.out.println("нет подключение логгирования не будет");
+           log.error("Нет подключения к audit-service, данные не отправлены");
         }
     }
 }

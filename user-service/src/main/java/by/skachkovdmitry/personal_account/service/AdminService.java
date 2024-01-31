@@ -10,6 +10,7 @@ import by.skachkovdmitry.personal_account.repo.entity.UserEntity;
 import by.skachkovdmitry.personal_account.service.api.IAdminService;
 import by.skachkovdmitry.personal_account.service.api.IUserService;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.dialect.lock.OptimisticEntityLockException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class AdminService implements IAdminService {
 
     private final IUserService userService;

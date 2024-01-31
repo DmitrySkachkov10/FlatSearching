@@ -5,6 +5,7 @@ import by.skachkovdmitry.personal_account.core.dto.LogInfo;
 import by.skachkovdmitry.personal_account.core.dto.security.UserSecurity;
 import by.skachkovdmitry.personal_account.service.api.feign.LogService;
 import feign.RetryableException;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
@@ -14,6 +15,7 @@ import org.aspectj.lang.annotation.Aspect;
 
 @Aspect
 @Component
+@Slf4j
 public class UserAspect {
 
     private final LogService logService;
@@ -66,7 +68,7 @@ public class UserAspect {
         try {
             logService.send(logInfo);
         } catch (RetryableException e) {
-            System.out.println("лог не будет");
+          log.error("Нет подключения к audit-service, данные не отправлены");
         }
     }
 

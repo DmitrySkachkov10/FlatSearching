@@ -1,18 +1,49 @@
 package by.dmitryskachkov.service;
 
-import org.jsoup.select.Elements;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.jsoup.nodes.Element;
-import org.springframework.stereotype.Service;
-import org.jsoup.Jsoup;
+
 import org.jsoup.nodes.Document;
+import org.springframework.scheduling.annotation.Scheduled;
+
+import org.springframework.stereotype.Service;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.util.concurrent.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
-@EnableScheduling
+
 public class ParserService {
+
+    private final BlockingQueue<String> dataQueue = new LinkedBlockingQueue<>();
+    private final Lock databaseLock = new ReentrantLock();
+
+    public void parseData(String url, int poolSize) {
+        ExecutorService executorService = Executors.newFixedThreadPool(poolSize);
+        for (int i = 0; i < poolSize; i++) {
+            int startPage = i;
+            executorService.execute(() -> parse(url, startPage * 50 + 1));
+        }
+
+    }
+
+
+    private void parse(String urlPart, int page) {
+        try {
+            for (int i = 0; i < 51; i++) {
+                Document document = Jsoup.connect(url + "?page=" + page + i).get();
+                //todo парсер квартиры
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
 
     private final String url = "https://realt.by/belarus/rent/flat-for-long/?page=1";
 
@@ -32,53 +63,10 @@ public class ParserService {
             long endTime = System.currentTimeMillis();
 
             // Вычисляем разницу времени
-            System.out.println( endTime - startTime);
+            System.out.println(endTime - startTime);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-
-//        try {
-//            // Замените url на ваш URL
-//
-//
-//
-//            Document document = Jsoup.connect(url).get();
-//
-//            // Используйте CSS-селектор для поиска <p> с текстом "объявлений"
-//            Elements pElements = document.select("p:contains(объявлений)");
-//
-//            // Перебирайте найденные <p>
-//            for (Element pElement : pElements) {
-//                // Ищем тег <b> внутри каждого <p>
-//                Element bElement = pElement.selectFirst("b");
-//
-//                if (bElement != null) {
-//                    // Если <b> найден, извлекаем текст и завершаем парсинг
-//                    String numberText = bElement.text().trim();
-//                    int number = Integer.parseInt(numberText);
-//                    System.out.println("Found number: " + number);
-//
-//                    long endTime = System.currentTimeMillis();
-//
-//                    // Вычисляем разницу времени
-//                    System.out.println( endTime - startTime);
-//                    return; // Прекращаем парсинг
-//                }
-//            }
-//
-//            // Если не найдено, вы можете обработать этот случай
-//            System.out.println("Не найдено соответствующих данных");
-//
-//
-//            long endTime = System.currentTimeMillis();
-//
-//            // Вычисляем разницу времени
-//            long elapsedTime = endTime - startTime;
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
 }

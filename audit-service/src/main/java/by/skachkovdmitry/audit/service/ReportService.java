@@ -18,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.ByteArrayInputStream;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.concurrent.locks.Lock;
@@ -41,7 +43,7 @@ public class ReportService implements IReportService {
         this.excelFileMaker = excelFileMaker;
     }
 
-    @Override //todo сделать нормаьный маппер и выделить отдельно его
+    @Override
     @Transactional
     public void addReport(UserActionAuditParam userActionAuditParam) {
 
@@ -91,7 +93,7 @@ public class ReportService implements IReportService {
 
     @Override
     public InputStreamResource download(UUID uuid) {
-        return null;//todo make return file)
+        return new InputStreamResource(new ByteArrayInputStream(excelFileMaker.loadFile(String.valueOf(uuid))));
     }
 
     @Async

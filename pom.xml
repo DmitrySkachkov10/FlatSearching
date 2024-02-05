@@ -11,13 +11,14 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.1.1</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
 
     <modules>
         <module>user-service</module>
         <module>mailing-service</module>
         <module>audit-service</module>
+        <module>parser-service</module>
     </modules>
 
     <dependencies>

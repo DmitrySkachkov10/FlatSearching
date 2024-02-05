@@ -7,9 +7,13 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.xmlbeans.ResourceLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 @Component
@@ -25,6 +29,13 @@ public class ExcelFileMaker {
     public ExcelFileMaker() {
     }
 
+    public byte[] loadFile(String fileName)  { //todo aop
+        try{
+            return Files.readAllBytes(Path.of(DIRECTORY + fileName + EXTENSION));
+        } catch (IOException e){
+            throw new IllegalArgumentException("Ошибка в системе");
+        }
+    }
 
     public void createFile(List<AuditEntity> auditEntityList) {
 

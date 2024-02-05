@@ -2,10 +2,12 @@ package by.skachkovdmitry.audit.controller;
 
 import by.skachkovdmitry.audit.core.dto.PageOfReport;
 import by.skachkovdmitry.audit.core.dto.UserActionAuditParam;
-import by.skachkovdmitry.audit.core.enums.ReportType;
+import org.springframework.core.io.Resource;
 import by.skachkovdmitry.audit.service.api.IReportService;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
@@ -40,11 +42,14 @@ public class ReportController {
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_GATEWAY);
         }
-
     }
 
-//    @GetMapping("/{uuid}/export")
-//    public ResponseEntity<byte[]> getExportedReport(@PathVariable UUID uuid) {
-//
-//    }
+    @GetMapping("/{uuid}/export")
+    public ResponseEntity<Resource> getExportedReport(@PathVariable UUID uuid) {
+       Resource resource =  reportService.download(uuid);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + uuid.toString() + ".xlsx\"")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
+    }
 }

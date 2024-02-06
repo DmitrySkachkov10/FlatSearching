@@ -1,6 +1,5 @@
 package by.dmitryskachkov.service;
 
-import lombok.SneakyThrows;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -10,17 +9,20 @@ import org.springframework.stereotype.Service;
 public class MainService {
     private final RealtByParser realtByParser;
 
-    public MainService(RealtByParser realtByParser) {
+    private final SaveService saveService;
+
+    public MainService(RealtByParser realtByParser, SaveService saveService) {
         this.realtByParser = realtByParser;
+        this.saveService = saveService;
     }
 
     @Scheduled(fixedDelay = 6000000)
-    public void test() {
-        System.out.println("Start2");
+    public void realByParser() {
+        saveService.save();
+        System.out.println("start realt.by parsing");
         realtByParser.startFlatRentForDayParsing();
         realtByParser.startFlatRentForLongParsing();
         realtByParser.startFlatSalesParsing();
-        realtByParser.saveData();
     }
 }
 

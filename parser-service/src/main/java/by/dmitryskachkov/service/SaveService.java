@@ -30,9 +30,10 @@ public class SaveService {
     @Async
     @Transactional
     public void save() {
-        ExecutorService saveService = Executors.newFixedThreadPool(5);
+        ExecutorService saveService = Executors.newFixedThreadPool(10);
         saveService.execute(() -> {
             while (true) {
+                System.out.println("Работаем");
                 try {
                     FlatEntity flatEntity = allFlats.poll(30, TimeUnit.SECONDS);
                     if (flatEntity == null) {

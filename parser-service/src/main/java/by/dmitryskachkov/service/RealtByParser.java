@@ -47,35 +47,28 @@ public class RealtByParser {
 
     @Async
     public void startFlatSalesParsing() {
-        System.out.println("1111111111111111111111111");
         startFlatParsing(salesUrl, OfferType.SALE);
     }
 
     @Async
     public void startFlatRentForLongParsing() {
-        System.out.println("2222222222222222222222222");
         startFlatParsing(rentForLongUrl, OfferType.RENT);
     }
 
     @Async
     public void startFlatRentForDayParsing() {
-        System.out.println("55555555555555555555555555");
         startFlatParsing(rentForDayUrl, OfferType.RENT_FOR_DAY);
     }
 
     private void startFlatParsing(String url, OfferType offerType) {
-
         int flatsCount = getFlatCount(url);
-        int poolSize = flatsCount / 100 + 1;
+        int poolSize = flatsCount / 1500 + 1;
 
-        System.out.println("poolsize = " + poolSize);
         ExecutorService findUrlsSerive = Executors.newFixedThreadPool(poolSize);
-        ExecutorService parseDataService = Executors.newFixedThreadPool(poolSize);
+        ExecutorService parseDataService = Executors.newFixedThreadPool(poolSize * 2);
 
         for (int i = 0; i < poolSize; i++) {
-            int startPage = i * 100 + 1;
-            System.out.println("startPage = " + startPage);
-
+            int startPage = i * 50 + 1;
             findUrlsSerive.execute(() ->
                     findFlatsUrls(new FindData(url, startPage, offerType)));
             parseDataService.execute(() ->
@@ -87,24 +80,37 @@ public class RealtByParser {
     }
 
     private void findFlatsUrls(FindData findData) {
-        try {
-            for (int i = 0; i < 100; i++) {
-                Thread.sleep(3000);
-                System.out.println(findData.getUrl() + "?page=" + findData.getStartPage() + i);
-                Document document = Jsoup.connect(findData.getUrl() + "?page=" + findData.getStartPage() + i).userAgent(RandomUserAgents.getRandomUserAgent()).get();
+
+        for (int i = 0; i < 50; i++) {
+            try {
+                if (((i + 1) % 5) == 0) {
+                    System.out.println("SOUT" + i);
+                    Thread.sleep(1500);
+                }
+
+                System.out.println("URL = " + findData.getUrl() + "?page=" + findData.getStartPage() + i);
+
+                Document document = Jsoup.connect(findData.getUrl() + "?page=" + findData.getStartPage() + i)
+                        .userAgent(RandomUserAgents.getRandomUserAgent())
+                        .get();
+                System.out.println("tyt1");
                 if (!document.data().isEmpty()) {
                     String urlPart = findData.getOfferType().getParameter();
                     Elements links = document.select("a[href~=" + urlPart + "\\d+]");
                     for (Element link : links) {
+                        System.out.println("puting");
                         putIntoQueue(link.attr("href"), findData.getOfferType());
                     }
                 } else {
                     return;
                 }
+                System.out.println("tyt2");
+
+            } catch (IOException | InterruptedException e) {
+                System.out.println("Error в getFlatsUrls");
             }
-        } catch (IOException | InterruptedException e) {
-            System.out.println("Error в getFlatsUrls");
         }
+
     }
 
     private void putIntoQueue(String url, OfferType offerType) throws InterruptedException {
@@ -113,27 +119,29 @@ public class RealtByParser {
         } else {
             saleLinks.put(url);
         }
-        System.out.println("FIRSTQUEUE PUTED - " + url);
+
+        System.out.println("FIRSTQUEUE PUTED - " + url + "o" + offerType.getParameter().toUpperCase());
     }
 
     private void parseFlats(OfferType offerType) {
         while (true) {
             try {
-                if (offerType.equals(OfferType.RENT)) {
-                    String url = rentLinks.poll(120, TimeUnit.SECONDS);
+                if (offerType.equals(OfferType.RENT) || offerType.equals(OfferType.RENT_FOR_DAY)) {
+                    String url = rentLinks.poll(1200, TimeUnit.SECONDS);
                     if (url.isEmpty()) {
+                        System.out.println("break");
                         break;
                     }
                     setUpData(url, OfferType.RENT);
                 } else {
-                    String url = rentLinks.poll(120, TimeUnit.SECONDS);
+                    String url = saleLinks.poll(1200, TimeUnit.SECONDS);
                     if (url.isEmpty()) {
+                        System.out.println("break");
                         break;
                     }
                     setUpData(url, OfferType.SALE);
                 }
             } catch (InterruptedException e) {
-                System.out.println("Ошибка #4341");
             }
         }
     }

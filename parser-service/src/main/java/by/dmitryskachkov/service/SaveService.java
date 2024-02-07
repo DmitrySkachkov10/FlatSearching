@@ -30,20 +30,23 @@ public class SaveService {
     @Async
     @Transactional
     public void save() {
-        ExecutorService saveService = Executors.newFixedThreadPool(10);
-        saveService.execute(() -> {
-            while (true) {
-                System.out.println("Работаем");
-                try {
-                    FlatEntity flatEntity = allFlats.poll(30, TimeUnit.SECONDS);
-                    if (flatEntity == null) {
-                        break;
+        ExecutorService saveService = Executors.newFixedThreadPool(8);
+        for (int i = 0; i < 8; i++) {
+            saveService.execute(() -> {
+                while (true) {
+                    System.out.println("SAVE TO DB");
+                    try {
+                        FlatEntity flatEntity = allFlats.poll(120, TimeUnit.SECONDS);
+                        if (flatEntity == null) {
+                            break;
+                        }
+                        flatRepo.save(flatEntity);
+                    } catch (InterruptedException e) {
                     }
-                    flatRepo.save(flatEntity);
-                } catch (InterruptedException e) {
                 }
-            }
-        });
+                System.err.println("END FULL ");
+            });
+        }
         saveService.shutdown();
     }
 }

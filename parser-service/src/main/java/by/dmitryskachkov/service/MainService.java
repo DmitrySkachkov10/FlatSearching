@@ -16,7 +16,7 @@ public class MainService {
         this.saveService = saveService;
     }
 
-    @Scheduled(fixedDelay = 6000000)
+    @Scheduled(fixedDelay =  24 * 60 * 60 * 1000)
     public void realByParser() {
         saveService.save();
         System.out.println("start realt.by parsing");

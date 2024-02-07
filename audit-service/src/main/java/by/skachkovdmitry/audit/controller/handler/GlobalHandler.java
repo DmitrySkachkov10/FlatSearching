@@ -1,4 +1,4 @@
-package by.skachkovdmitry.audit.controller;
+package by.skachkovdmitry.audit.controller.handler;
 
 import by.dmitryskachkov.dto.ErrorResponseDto;
 import by.dmitryskachkov.entity.ValidationError;

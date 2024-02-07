@@ -1,4 +1,4 @@
-package by.skachkovdmitry.audit.controller;
+package by.skachkovdmitry.audit.controller.upload;
 
 import by.skachkovdmitry.audit.core.dto.LogInfo;
 import by.skachkovdmitry.audit.service.api.IAuditService;

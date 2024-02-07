@@ -21,7 +21,6 @@ public class SaveService {
     public void putIntoSaveQueue(FlatEntity flatEntity) {
         try {
             allFlats.put(flatEntity);
-            System.out.println("HAVE PUTTED INTO FINAL QUEUE");
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -30,13 +29,13 @@ public class SaveService {
     @Async
     @Transactional
     public void save() {
-        ExecutorService saveService = Executors.newFixedThreadPool(8);
-        for (int i = 0; i < 8; i++) {
+        ExecutorService saveService = Executors.newFixedThreadPool(15);
+        for (int i = 0; i < 15; i++) {
             saveService.execute(() -> {
                 while (true) {
                     System.out.println("SAVE TO DB");
                     try {
-                        FlatEntity flatEntity = allFlats.poll(120, TimeUnit.SECONDS);
+                        FlatEntity flatEntity = allFlats.poll(30, TimeUnit.SECONDS);
                         if (flatEntity == null) {
                             break;
                         }

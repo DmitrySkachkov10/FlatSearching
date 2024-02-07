@@ -32,6 +32,9 @@ public class RealtByParser {
 
     @Value("${app.urls.realt.sales}")
     private String salesUrl;
+
+    private int PAGE_SIZE = 50;
+
     private final BlockingQueue<String> rentLinks = new LinkedBlockingQueue<>();
     private final BlockingQueue<String> saleLinks = new LinkedBlockingQueue<>();
 
@@ -58,18 +61,19 @@ public class RealtByParser {
 
     private void startFlatParsing(String url, OfferType offerType) {
         int flatsCount = getFlatCount(url);
-        int poolSize = flatsCount / 1500 + 1;
+        int poolSize = flatsCount / 30000 + 1;
+        System.out.println(poolSize);
         System.out.println("POOLSIZE = " + poolSize);
-        ExecutorService findUrlsService = Executors.newFixedThreadPool(2);
-        ExecutorService parseDataService = Executors.newFixedThreadPool(2);
+        ExecutorService findUrlsService = Executors.newFixedThreadPool(poolSize);
+        ExecutorService parseDataService = Executors.newFixedThreadPool(poolSize * 2);
 
-        for (int i = 0; i < 2; i++) {
-            int startPage = i * 50 + 1;
+        for (int i = 0; i < poolSize; i++) {
+            int startPage = i * PAGE_SIZE + 1;
             findUrlsService.execute(() ->
                     findFlatsUrls(new FindData(url, startPage, offerType)));
         }
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < poolSize * 2; i++) {
             parseDataService.execute(() ->
                     parseFlats(offerType));
         }
@@ -80,41 +84,42 @@ public class RealtByParser {
 
     private void findFlatsUrls(FindData findData) {
 
-        for (int i = 0; i < 3; i++) {
-            System.out.println("FIND URL iteration = " + i);
+        for (int i = 0; i < 1; i++) {
             try {
-//                if (i > 0 && (i % 10 == 0)) {
+//                if (i > 0 && (i % 5 == 0)) {
 //                    System.out.println("Sleeping at iteration " + i);
 //                    Thread.sleep(60000);
 //                }
-                Document document = Jsoup.connect(findData.getUrl() + "?page=" + findData.getStartPage() + i)
+                String goUrl = findData.getUrl() + "?page=" + i;
+
+                Document document = Jsoup.connect(goUrl)
                         .userAgent(RandomUserAgents.getRandomUserAgent())
                         .get();
 
                 if (!document.data().isEmpty()) {
-                    String urlPart = findData.getOfferType().getParameter();
-                    Elements links = document.select("a[href~=" + urlPart + "\\d+]");
+                    Elements links = document.select("a[href~=" + ".*" + findData.getOfferType().getParameter() + "\\d+]");
                     for (Element link : links) {
-                        putIntoQueue(link.attr("href"), findData.getOfferType());
+                        String findUrl = (link.attr("href")).replace(basicUrl, "");
+                        putIntoQueue(findUrl, findData.getOfferType());
                     }
                 } else {
                     System.err.println("END PARSING");
                     break;
                 }
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException e) {
                 System.err.println("Error в getFlatsUrls");
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
-        System.err.println("STOP GETTING LINKS");
     }
 
     private void putIntoQueue(String url, OfferType offerType) throws InterruptedException {
+        System.out.println("Putted into 1 QUEUE");
         if (offerType.equals(OfferType.RENT) || offerType.equals(OfferType.RENT_FOR_DAY)) {
-            rentLinks.put(url);
-            System.out.println("RENT links - " + url);
+            rentLinks.put(basicUrl + url);
         } else {
-            saleLinks.put(url);
-            System.out.println("SALE links - " + url);
+            saleLinks.put(basicUrl + url);
         }
     }
 
@@ -123,17 +128,13 @@ public class RealtByParser {
             try {
                 String url;
                 if (offerType.equals(OfferType.RENT) || offerType.equals(OfferType.RENT_FOR_DAY)) {
-                    url = rentLinks.poll(180, TimeUnit.SECONDS);
+                    url = rentLinks.poll(30, TimeUnit.SECONDS);
                 } else {
-                    url = saleLinks.poll(180, TimeUnit.SECONDS);
+                    url = saleLinks.poll(30, TimeUnit.SECONDS);
                 }
-
-                // Проверка на null перед вызовом isEmpty()
-                if (url != null && url.isEmpty()) {
+                if (url == null || url.isEmpty()) {
                     break;
                 }
-
-                System.out.println("SET UP " + offerType);
                 setUpData(url, offerType);
             } catch (InterruptedException e) {
                 // Обработка исключения
@@ -144,16 +145,15 @@ public class RealtByParser {
 
     private void setUpData(String flatUrl, OfferType offerType) {
         FlatEntity flat = new FlatEntity();
-        String originalUrl = basicUrl + flatUrl;
-
         try {
+            Thread.sleep(50);
             flat.setUuid(UUID.randomUUID());
             flat.setCreateDate(LocalDateTime.now());
             flat.setUpdateDate(LocalDateTime.now());
-            flat.setOriginalUrl(originalUrl);
+            flat.setOriginalUrl(flatUrl);
             flat.setOfferType(offerType);
 
-            Document document = Jsoup.connect(originalUrl).userAgent(RandomUserAgents.getRandomUserAgent()).get();
+            Document document = Jsoup.connect(flatUrl).userAgent(RandomUserAgents.getRandomUserAgent()).get();
             Elements liElements = document.select("li.relative");
             for (Element liElement : liElements) {
                 Element spanElement = liElement.selectFirst("span");
@@ -194,18 +194,16 @@ public class RealtByParser {
             Set<Photos> photos = new HashSet<>();
             for (Element imgElement : imgElements) {
                 String src = imgElement.attr("src");
-                if (!src.isEmpty()) {
+                if (!src.isEmpty() && !src.contains("thumb/c/160x160")) {
                     photos.add(new Photos(src, flat));
                 }
             }
 
             flat.setPhotos(photos);
-
-            System.out.println("PARSING FROM QUEUE AND SAVE INTO FINAL QUEUE");
+            System.out.println("Putted into 2 QUEUE");
             saveService.putIntoSaveQueue(flat);
-        } catch (IOException error) {
-            System.err.println(originalUrl);
-            error.printStackTrace();
+        } catch (IOException | InterruptedException error) {
+            System.err.println("error -> " + flatUrl);
         }
     }
 
@@ -225,7 +223,7 @@ public class RealtByParser {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error в getFlatCount");
+            e.printStackTrace();
         }
         return 0;
     }

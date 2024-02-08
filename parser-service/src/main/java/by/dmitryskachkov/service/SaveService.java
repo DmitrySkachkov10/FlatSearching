@@ -5,7 +5,6 @@ import by.dmitryskachkov.repo.entity.FlatEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.concurrent.*;
 
 @Service

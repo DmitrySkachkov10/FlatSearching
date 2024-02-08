@@ -17,9 +17,7 @@ public class MainService {
     private final RealtByParser realtByParser;
 
     private final SaveService saveService;
-
-    private final String baseUrl = "https://realt.by";
-
+    
     public MainService(RealtByParser realtByParser, SaveService saveService) {
         this.realtByParser = realtByParser;
         this.saveService = saveService;

@@ -10,13 +10,35 @@ public class FindData {
 
     private OfferType offerType;
 
+    private int pageCount;
+
+    private int pageCountForThread;
+
     public FindData() {
     }
 
-    public FindData(String url, int startPage, OfferType offerType) {
+    public FindData(String url, int startPage, OfferType offerType, int pageCount, int pageCountForThread) {
         this.url = url;
         this.startPage = startPage;
         this.offerType = offerType;
+        this.pageCount = pageCount;
+        this.pageCountForThread = pageCountForThread;
+    }
+
+    public int getPageCountForThread() {
+        return pageCountForThread;
+    }
+
+    public void setPageCountForThread(int pageCountForThread) {
+        this.pageCountForThread = pageCountForThread;
+    }
+
+    public int getPageCount() {
+        return pageCount;
+    }
+
+    public void setPageCount(int pageCount) {
+        this.pageCount = pageCount;
     }
 
     public String getUrl() {

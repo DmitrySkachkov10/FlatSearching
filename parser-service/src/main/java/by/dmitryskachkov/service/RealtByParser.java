@@ -33,7 +33,9 @@ public class RealtByParser {
     @Value("${app.urls.realt.sales}")
     private String salesUrl;
 
-    private int PAGE_SIZE = 50;
+    private int PAGE_SIZE = 30;
+
+    private int POOL_SIZE = 10;
 
     private final BlockingQueue<String> rentLinks = new LinkedBlockingQueue<>();
     private final BlockingQueue<String> saleLinks = new LinkedBlockingQueue<>();
@@ -60,20 +62,18 @@ public class RealtByParser {
     }
 
     private void startFlatParsing(String url, OfferType offerType) {
+
         int flatsCount = getFlatCount(url);
-        int poolSize = flatsCount / 30000 + 1;
-        System.out.println(poolSize);
-        System.out.println("POOLSIZE = " + poolSize);
-        ExecutorService findUrlsService = Executors.newFixedThreadPool(poolSize);
-        ExecutorService parseDataService = Executors.newFixedThreadPool(poolSize * 2);
+        int allPageCount = flatsCount / PAGE_SIZE + 1;
+        int pageCountForThread = flatsCount / (PAGE_SIZE * POOL_SIZE) + 1;
 
-        for (int i = 0; i < poolSize; i++) {
-            int startPage = i * PAGE_SIZE + 1;
+        ExecutorService findUrlsService = Executors.newFixedThreadPool(POOL_SIZE);
+        ExecutorService parseDataService = Executors.newFixedThreadPool(POOL_SIZE);
+
+        for (int i = 0; i < POOL_SIZE; i++) {
+            int startPage = i * pageCountForThread + 1;
             findUrlsService.execute(() ->
-                    findFlatsUrls(new FindData(url, startPage, offerType)));
-        }
-
-        for (int i = 0; i < poolSize * 2; i++) {
+                    findFlatsUrls(new FindData(url, startPage, offerType, allPageCount, pageCountForThread)));
             parseDataService.execute(() ->
                     parseFlats(offerType));
         }
@@ -84,38 +84,39 @@ public class RealtByParser {
 
     private void findFlatsUrls(FindData findData) {
 
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < findData.getPageCountForThread(); i++) {
             try {
-//                if (i > 0 && (i % 5 == 0)) {
-//                    System.out.println("Sleeping at iteration " + i);
-//                    Thread.sleep(60000);
-//                }
-                String goUrl = findData.getUrl() + "?page=" + i;
 
-                Document document = Jsoup.connect(goUrl)
+                int pageNumber = findData.getStartPage() + i;
+                if (findData.getPageCount() < pageNumber) {
+                    break;
+                }
+
+                //todo  вынести в отдельный метод
+                if (i > 0 && (i % 10 == 0)) {
+                    System.out.println("Sleeping at iteration " + i);
+                    Thread.sleep(60000);
+                }
+
+                String findingUrl = findData.getUrl() + "?page=" + pageNumber;
+                Document document = Jsoup.connect(findingUrl)
                         .userAgent(RandomUserAgents.getRandomUserAgent())
                         .get();
 
-                if (!document.data().isEmpty()) {
-                    Elements links = document.select("a[href~=" + ".*" + findData.getOfferType().getParameter() + "\\d+]");
-                    for (Element link : links) {
-                        String findUrl = (link.attr("href")).replace(basicUrl, "");
-                        putIntoQueue(findUrl, findData.getOfferType());
-                    }
-                } else {
-                    System.err.println("END PARSING");
-                    break;
+                //todo вынсти в метод для поиска ссылок
+                Elements links = document.select("a[href~=" + ".*" + findData.getOfferType().getParameter() + "\\d+]");
+                for (Element link : links) {
+                    String findUrl = (link.attr("href")).replace(basicUrl, "");
+                    putIntoQueue(findUrl, findData.getOfferType());
                 }
-            } catch (IOException e) {
+
+            } catch (IOException | InterruptedException e) {
                 System.err.println("Error в getFlatsUrls");
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
             }
         }
     }
 
     private void putIntoQueue(String url, OfferType offerType) throws InterruptedException {
-        System.out.println("Putted into 1 QUEUE");
         if (offerType.equals(OfferType.RENT) || offerType.equals(OfferType.RENT_FOR_DAY)) {
             rentLinks.put(basicUrl + url);
         } else {
@@ -133,11 +134,12 @@ public class RealtByParser {
                     url = saleLinks.poll(30, TimeUnit.SECONDS);
                 }
                 if (url == null || url.isEmpty()) {
+                    System.err.println("ERROR IN parseFlats");
                     break;
                 }
                 setUpData(url, offerType);
             } catch (InterruptedException e) {
-                // Обработка исключения
+                e.printStackTrace();
             }
         }
         System.err.println("END SETUPS");
@@ -153,6 +155,7 @@ public class RealtByParser {
             flat.setOriginalUrl(flatUrl);
             flat.setOfferType(offerType);
 
+            //todo в отделный метод что возвращает Document по URL или в отдельный класс вообще
             Document document = Jsoup.connect(flatUrl).userAgent(RandomUserAgents.getRandomUserAgent()).get();
             Elements liElements = document.select("li.relative");
             for (Element liElement : liElements) {
@@ -190,12 +193,14 @@ public class RealtByParser {
                 flat.setPrice(elements.get(0).text());
             }
 
+
+            //todo отдельный метод для фоток
             Elements imgElements = document.select("img");
             Set<Photos> photos = new HashSet<>();
             for (Element imgElement : imgElements) {
                 String src = imgElement.attr("src");
                 if (!src.isEmpty() && !src.contains("thumb/c/160x160")) {
-                    photos.add(new Photos(src, flat));
+                    photos.add(new Photos(UUID.randomUUID(), src, flat));
                 }
             }
 

@@ -122,6 +122,5 @@ public class ReportService implements IReportService {
             reportEntity.setStatus(ReportStatus.DONE);
             reportRepo.saveAndFlush(reportEntity);
         }
-
     }
 }

@@ -1,8 +1,8 @@
 FROM eclipse-temurin:19-jre-focal
 MAINTAINER DMITRY
+# Устанавливаем рабочую директорию
+WORKDIR /app
 
-ADD ./target/audit-service.jar /app/
+COPY target/audit-service-0.0.1-SNAPSHOT.jar audit-service.jar
 
-CMD ["java", "-Xmx200m", "-jar", "/app/audit-service.jar"]
-
-EXPOSE 8080 8089
+CMD ["java", "-jar", "audit-service.jar"]

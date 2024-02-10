@@ -31,22 +31,37 @@ services:
 
   user-service:
     build: user-service
-    image: flats_user-service:1.0.17
+    image: flats_user-service:1.1.2xk
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db/flat_searching
     ports:
       - "9099:9099"
     depends_on:
       - db
-      - mailing-service
     networks:
       - flats_ntwrk
 
   mailing-service:
     build: mailing-service
-    image: flats_mailing-service:1.0.5
+    image: flats_mailing-service:1.1.3
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db/flat_searching
+    depends_on:
+      - db
     ports:
       - "83"
+    networks:
+      - flats_ntwrk
+
+  audit-service:
+    build: audit-service
+    image: flats_audit-service:1.0.3
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db/flat_searching
+    ports:
+      - "95"
+    depends_on:
+      - db
     networks:
       - flats_ntwrk
 

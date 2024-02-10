@@ -23,10 +23,10 @@ public class MainService {
     public void realByParser() {
         System.out.println("start realt.by parsing");
 
-//        saveService.save();
-//        realtByParser.startFlatRentForDayParsing();
-//        realtByParser.startFlatRentForLongParsing();
-//        realtByParser.startFlatSalesParsing();
+        saveService.save();
+        realtByParser.startFlatRentForDayParsing();
+        realtByParser.startFlatRentForLongParsing();
+        realtByParser.startFlatSalesParsing();
         photoRepo.removeDuplicatePhotos();
         System.out.println("end");
     }

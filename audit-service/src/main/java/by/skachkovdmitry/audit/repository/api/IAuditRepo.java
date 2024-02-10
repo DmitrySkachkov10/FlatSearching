@@ -11,9 +11,9 @@ import java.util.UUID;
 
 public interface IAuditRepo extends JpaRepository<AuditEntity, UUID> {
 
-    @Query("SELECT a FROM AuditEntity a WHERE a.user.uuid = :userUuid AND a.createDate BETWEEN :startDate AND :endDate")
-    List<AuditEntity> findAuditsForUserBetweenDates(
-            @Param("userUuid") UUID userUuid,
+    @Query("SELECT a FROM AuditEntity a WHERE a.user.uuid IN :usersUuid AND a.createDate BETWEEN :startDate AND :endDate")
+    List<AuditEntity> findAuditsForUsersBetweenDates(
+            @Param("usersUuid") List<UUID> usersUuid,
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );

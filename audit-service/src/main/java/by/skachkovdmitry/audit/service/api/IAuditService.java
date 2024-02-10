@@ -18,5 +18,5 @@ public interface IAuditService {
 
     PageOfAudit getPageOfAudit(Pageable pageable);
 
-    List<AuditEntity> getAuditsForUserBetweenDates(UUID userUuid, LocalDateTime startDate, LocalDateTime endDate);
+    List<AuditEntity> getAuditsForUserBetweenDates(List<UUID> usersUuid, LocalDateTime startDate, LocalDateTime endDate);
 }

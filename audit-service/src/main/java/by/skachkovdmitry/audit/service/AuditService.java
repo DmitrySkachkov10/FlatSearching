@@ -84,9 +84,9 @@ public class AuditService implements IAuditService {
     }
 
     @Override//можно через aop тут удобно будте
-    public List<AuditEntity> getAuditsForUserBetweenDates(UUID userUuid, LocalDateTime startDate, LocalDateTime endDate) {
+    public List<AuditEntity> getAuditsForUserBetweenDates(List<UUID> usersUuid, LocalDateTime startDate, LocalDateTime endDate) {
         try {
-            return auditRepo.findAuditsForUserBetweenDates(userUuid, startDate, endDate);
+            return auditRepo.findAuditsForUsersBetweenDates(usersUuid, startDate, endDate);
         } catch (Exception e){
             throw new ValidationError("Неверный формат 'from' or 'to'");
         }

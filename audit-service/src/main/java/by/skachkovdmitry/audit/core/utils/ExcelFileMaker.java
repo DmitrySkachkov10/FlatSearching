@@ -1,14 +1,12 @@
 package by.skachkovdmitry.audit.core.utils;
 
+import by.dmitryskachkov.entity.NoContentException;
+import by.dmitryskachkov.entity.SystemError;
 import by.skachkovdmitry.audit.repository.entity.AuditEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.xmlbeans.ResourceLoader;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,7 +31,7 @@ public class ExcelFileMaker {
         try{
             return Files.readAllBytes(Path.of(DIRECTORY + fileName + EXTENSION));
         } catch (IOException e){
-            throw new IllegalArgumentException("Ошибка в системе");
+            throw new NoContentException("Сервер, по предоставленному uuid, не смог найти информацию");
         }
     }
 
@@ -68,7 +66,7 @@ public class ExcelFileMaker {
             log.info("Файл успешно создан с именем - " + fileName);
         } catch (IOException e) {
             log.error("Ошибка в создании файла");
-            e.printStackTrace();
+           throw new SystemError();
         }
     }
     public void setFileName(String fileName) {

@@ -5,7 +5,6 @@ import by.skachkovdmitry.audit.config.properies.UnixTimestampToLocalDateTimeDese
 import by.skachkovdmitry.audit.core.enums.EssenceType;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.time.LocalDateTime;
 import java.util.Objects;
 

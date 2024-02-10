@@ -10,6 +10,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface IReportRepo extends JpaRepository<ReportEntity, UUID> {
-    boolean existsByUserUuidAndFromDateAndToDate(UUID userUuid, LocalDateTime fromDate, LocalDateTime toDate);
 
 }

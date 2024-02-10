@@ -1,12 +1,15 @@
 package by.skachkovdmitry.audit.core.dto;
 
-import by.skachkovdmitry.audit.config.properies.LocalDateTimeUnixTimestampSerializer;
-import by.skachkovdmitry.audit.config.properies.UnixTimestampToLocalDateTimeDeserializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.*;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -15,14 +18,12 @@ import java.util.UUID;
 @Setter
 @EqualsAndHashCode
 public class UserActionAuditParam {
+    private List<UUID> userUuid;
 
-    private UUID user;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate from;
 
-    @JsonSerialize(using = LocalDateTimeUnixTimestampSerializer.class)
-    @JsonDeserialize(using = UnixTimestampToLocalDateTimeDeserializer.class)
-    private LocalDateTime from;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate to;
 
-    @JsonSerialize(using = LocalDateTimeUnixTimestampSerializer.class)
-    @JsonDeserialize(using = UnixTimestampToLocalDateTimeDeserializer.class)
-    private LocalDateTime to;
 }

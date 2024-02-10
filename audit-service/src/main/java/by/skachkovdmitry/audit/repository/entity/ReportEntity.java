@@ -5,11 +5,15 @@ import by.skachkovdmitry.audit.core.enums.ReportType;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-@Table(name = "report", schema = "audit")
+
+@Table(name = "report", schema = "audit",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_uuid", "from_date", "to_date"}))
+
 public class ReportEntity {
     @Id
     private UUID uuid;
@@ -28,17 +32,20 @@ public class ReportEntity {
 
     private String description;
 
-    private UUID userUuid;
+    @Column(name = "user_uuid")
+    private List<UUID> userUuid;
 
+    @Column(name = "from_date")
     private LocalDateTime fromDate;
 
+    @Column(name = "to_date")
     private LocalDateTime toDate;
 
 
     public ReportEntity() {
     }
 
-    public ReportEntity(UUID uuid, LocalDateTime createDate, LocalDateTime updateDate, ReportStatus status, ReportType type, String description, UUID userUuid, LocalDateTime fromDate, LocalDateTime toDate) {
+    public ReportEntity(UUID uuid, LocalDateTime createDate, LocalDateTime updateDate, ReportStatus status, ReportType type, String description, List<UUID>  userUuid, LocalDateTime fromDate, LocalDateTime toDate) {
         this.uuid = uuid;
         this.createDate = createDate;
         this.updateDate = updateDate;
@@ -98,11 +105,11 @@ public class ReportEntity {
         this.description = description;
     }
 
-    public UUID getUserUuid() {
+    public List<UUID>  getUserUuid() {
         return userUuid;
     }
 
-    public void setUserUuid(UUID userUuid) {
+    public void setUserUuid(List<UUID>  userUuid) {
         this.userUuid = userUuid;
     }
 

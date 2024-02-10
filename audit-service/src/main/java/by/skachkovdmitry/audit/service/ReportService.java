@@ -1,5 +1,7 @@
 package by.skachkovdmitry.audit.service;
 
+
+import by.dmitryskachkov.entity.SystemError;
 import by.dmitryskachkov.entity.ValidationError;
 import by.skachkovdmitry.audit.core.dto.PageOfReport;
 import by.skachkovdmitry.audit.core.dto.Report;
@@ -13,6 +15,7 @@ import by.skachkovdmitry.audit.service.api.IAuditService;
 import by.skachkovdmitry.audit.service.api.IReportService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
@@ -47,22 +50,23 @@ public class ReportService implements IReportService {
     @Transactional
     public void addReport(UserActionAuditParam userActionAuditParam) {
 
-        if (!reportRepo.existsByUserUuidAndFromDateAndToDate(userActionAuditParam.getUser(), userActionAuditParam.getFrom(), userActionAuditParam.getTo())) {
-            ReportEntity reportEntity = new ReportEntity(UUID.randomUUID(),
-                    LocalDateTime.now(),
-                    LocalDateTime.now(),
-                    ReportStatus.LOADED,
-                    ReportType.JOURNAL_AUDIT,
-                    FROM + userActionAuditParam.getFrom() + TO + userActionAuditParam.getTo(),
-                    userActionAuditParam.getUser(),
-                    userActionAuditParam.getFrom(),
-                    userActionAuditParam.getTo()
-            );
+        ReportEntity reportEntity = new ReportEntity(UUID.randomUUID(),
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                ReportStatus.LOADED,
+                ReportType.JOURNAL_AUDIT,
+                FROM + userActionAuditParam.getFrom() + TO + userActionAuditParam.getTo(),
+                userActionAuditParam.getUserUuid(),
+                userActionAuditParam.getFrom().atStartOfDay(),
+                userActionAuditParam.getTo().atStartOfDay());
+        try {
             reportRepo.saveAndFlush(reportEntity);
             log.info("Запуск создания отчета" + LocalDateTime.now());
             create(reportEntity);
-        } else {
-           throw new ValidationError("Данный отчет уже создан");
+
+        } catch (DataIntegrityViolationException e) {
+            log.error("Попытка создания дубликата отчета");
+            throw new ValidationError("Данный отчет уже создан");
         }
     }
 
@@ -77,12 +81,14 @@ public class ReportService implements IReportService {
                 reportEntities.isFirst(),
                 reportEntities.getNumberOfElements(),
                 reportEntities.isLast(),
-                reportEntities.getContent().stream().map(elem -> new Report(elem.getUuid().toString(),
-                        elem.getCreateDate(),
-                        elem.getUpdateDate(),
-                        elem.getStatus(),
-                        elem.getDescription(),
-                        new UserActionAuditParam(elem.getUserUuid(), elem.getFromDate(), elem.getToDate()))).toList());
+                reportEntities.getContent().stream()
+                        .map(elem -> new Report(elem.getUuid().toString(),
+                                elem.getCreateDate(),
+                                elem.getUpdateDate(),
+                                elem.getStatus(),
+                                elem.getDescription(), new UserActionAuditParam(elem.getUserUuid(),
+                                elem.getFromDate().toLocalDate(),
+                                elem.getToDate().toLocalDate()))).toList());
     }
 
     @Override
@@ -110,14 +116,12 @@ public class ReportService implements IReportService {
         } finally {
             lock.unlock();
         }
-
         if (shouldMakeFile) {
             excelFileMaker.setFileName(reportEntity.getUuid().toString());
-            excelFileMaker.createFile(auditService.getAuditsForUserBetweenDates(reportEntity.getUserUuid(),
-                    reportEntity.getFromDate(),
-                    reportEntity.getToDate()));
+            excelFileMaker.createFile(auditService.getAuditsForUserBetweenDates(reportEntity.getUserUuid(), reportEntity.getFromDate(), reportEntity.getToDate()));
             reportEntity.setStatus(ReportStatus.DONE);
             reportRepo.saveAndFlush(reportEntity);
         }
+
     }
 }

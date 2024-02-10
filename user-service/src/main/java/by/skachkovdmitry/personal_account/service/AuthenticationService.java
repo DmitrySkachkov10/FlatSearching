@@ -32,7 +32,8 @@ public class AuthenticationService implements IAuthenticationService {
 
     private final String MAIL_REGEX = "\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*\\.\\w{2,4}";
 
-    private final String FIO_REGEX = "^[А-ЯЁ][а-яё]+(\\s[А-ЯЁ][а-яё]+){1,2}";
+    private final String FIO_REGEX = "^[А-ЯЁA-Z][а-яёA-Za-z]+(\\s[А-ЯЁA-Z][а-яёA-Za-z]+){1,2}";
+
 
     private final String PASSWORD_REGEX = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()])(?=\\S+$).{8,20}";
 

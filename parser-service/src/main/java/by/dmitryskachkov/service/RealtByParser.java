@@ -4,8 +4,10 @@ import by.dmitryskachkov.core.RandomUserAgents;
 import by.dmitryskachkov.core.enums.OfferType;
 import by.dmitryskachkov.core.util.NumberUtils;
 import by.dmitryskachkov.core.util.FindData;
+import by.dmitryskachkov.entity.SystemError;
 import by.dmitryskachkov.repo.entity.FlatEntity;
 import by.dmitryskachkov.repo.entity.Photos;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -22,6 +24,7 @@ import java.util.concurrent.*;
 
 @Service
 @EnableAsync
+@Slf4j
 public class RealtByParser {
     @Value("${app.urls.realt.basic}")
     private String basicUrl;
@@ -88,15 +91,12 @@ public class RealtByParser {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-        System.out.println("All threads have finished their work.");
+        log.info("All threads have finished their work.");
     }
 
     private void findFlatsUrls(FindData findData) {
 
-//        for (int i = 0; i < findData.getPageCountForThread(); i++) {
-        for (int i = 0; i < 1; i++) {
-
+        for (int i = 0; i < findData.getPageCountForThread(); i++) {
             try {
                 int pageNumber = findData.getStartPage() + i;
                 if (findData.getPageCount() < pageNumber) {
@@ -113,9 +113,10 @@ public class RealtByParser {
                 }
 
             } catch (IOException | InterruptedException e) {
-                System.err.println("Error в getFlatsUrls");
+                throw new SystemError("Ошибка в получении url из ресурса realt.by");
             }
         }
+        log.info("stop searching new flats`s urls");
     }
 
     private void putIntoQueue(String url, OfferType offerType) throws InterruptedException {
@@ -124,7 +125,6 @@ public class RealtByParser {
         } else {
             saleLinks.put(basicUrl + url);
         }
-        System.out.println("PUTTED 1 ");
     }
 
     private void parseFlats(OfferType offerType) {
@@ -144,7 +144,7 @@ public class RealtByParser {
                 e.printStackTrace();
             }
         }
-        System.err.println("END SETUPS");
+        log.info("stop parse flats");
     }
 
     private void setUpData(String flatUrl, OfferType offerType) {
@@ -195,10 +195,9 @@ public class RealtByParser {
             }
 
             flat.setPhotos(getPhotos(document, flat));
-            System.out.println("PUTTED 2 QUEUE");
             saveService.putIntoSaveQueue(flat);
         } catch (IOException | InterruptedException error) {
-            System.err.println("error -> " + flatUrl);
+            error.printStackTrace();
         }
     }
 

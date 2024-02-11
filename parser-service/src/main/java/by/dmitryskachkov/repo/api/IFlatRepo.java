@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 
-public interface IFlatRepo extends JpaRepository<FlatEntity, UUID> {
+public interface IFlatRepo extends JpaRepository<FlatEntity, String> {
 }

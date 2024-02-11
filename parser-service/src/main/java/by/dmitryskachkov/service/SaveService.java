@@ -2,13 +2,14 @@ package by.dmitryskachkov.service;
 
 import by.dmitryskachkov.repo.api.IFlatRepo;
 import by.dmitryskachkov.repo.entity.FlatEntity;
+import by.dmitryskachkov.service.api.ISaveService;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.concurrent.*;
 
 @Service
-public class SaveService {
+public class SaveService implements ISaveService {
 
     private final IFlatRepo flatRepo;
     private final BlockingQueue<FlatEntity> allFlats = new LinkedBlockingQueue<>();
@@ -25,26 +26,32 @@ public class SaveService {
         }
     }
 
+
     @Async
     @Transactional
+    @Override
     public void save() {
-        ExecutorService saveService = Executors.newFixedThreadPool(15);
-        for (int i = 0; i < 15; i++) {
-            saveService.execute(() -> {
-                while (true) {
-                    System.out.println("SAVE TO DB");
-                    try {
-                        FlatEntity flatEntity = allFlats.poll(30, TimeUnit.SECONDS);
-                        if (flatEntity == null) {
-                            break;
-                        }
-                        flatRepo.save(flatEntity);
-                    } catch (InterruptedException e) {
-                    }
+        while (true) {
+            try {
+                FlatEntity flatEntity = allFlats.poll(10, TimeUnit.SECONDS);
+                if (flatEntity == null) {
+                    System.err.println("end of saving thread");
+                    break;
                 }
-                System.err.println("END FULL ");
-            });
+                FlatEntity existingEntity = flatRepo.findById(flatEntity.getOriginalUrl()).orElse(null);
+
+                if (existingEntity == null){
+                    flatRepo.save(flatEntity);
+                }
+
+                if (!existingEntity.getPrice().equals(flatEntity.getPrice())){
+                    flatRepo.save(flatEntity);
+                }
+
+            } catch (Throwable e) {
+                System.err.println("2" + e.getMessage());
+            }
         }
-        saveService.shutdown();
     }
 }
+

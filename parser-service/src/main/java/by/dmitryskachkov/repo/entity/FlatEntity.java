@@ -14,19 +14,22 @@ import java.util.UUID;
 @Entity
 @Table(schema = "flat", name = "flat")
 public class FlatEntity {
+
+    @Column(name = "original_url")
     @Id
+    private String originalUrl;  //todo yes
     private UUID uuid;
     @Column(name = "dt_create")
     private LocalDateTime createDate;//todo yes
     @Column(name = "dt_update")
+    @Version
     private LocalDateTime updateDate;//todo yes
     @Enumerated(EnumType.STRING)
     private OfferType offerType; //todo yes
     private String description; //todo sdelat`
     private int floor;//todo yes
     private int bedrooms;//todo yes
-    @Column(name = "original_url")
-    private String originalUrl;  //todo yes
+
     private String price; //todo sdelat`
     private float area; //todo yes
     @OneToMany(mappedBy = "flat", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -19,6 +19,7 @@
         <module>mailing-service</module>
         <module>audit-service</module>
         <module>parser-service</module>
+        <module>flat-service</module>
     </modules>
 
     <dependencies>

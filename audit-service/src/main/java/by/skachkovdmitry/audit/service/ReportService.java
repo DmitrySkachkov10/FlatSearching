@@ -15,10 +15,10 @@ import by.skachkovdmitry.audit.service.api.IAuditService;
 import by.skachkovdmitry.audit.service.api.IReportService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,17 +33,18 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ReportService implements IReportService {
     private final IReportRepo reportRepo;
 
+    private final TaskExecutor taskExecutor;
     private final ExcelFileMaker excelFileMaker;
     private final IAuditService auditService;
     private final Lock lock = new ReentrantLock();
     private final String FROM = "from: ";
     private final String TO = " to: ";
-    //todo normal final TO FROM????
 
-    public ReportService(IReportRepo reportRepo, IAuditService auditService, ExcelFileMaker excelFileMaker) {
+    public ReportService(IReportRepo reportRepo, TaskExecutor taskExecutor, ExcelFileMaker excelFileMaker, IAuditService auditService) {
         this.reportRepo = reportRepo;
-        this.auditService = auditService;
+        this.taskExecutor = taskExecutor;
         this.excelFileMaker = excelFileMaker;
+        this.auditService = auditService;
     }
 
     @Override
@@ -61,9 +62,7 @@ public class ReportService implements IReportService {
                 userActionAuditParam.getTo().atStartOfDay());
         try {
             reportRepo.saveAndFlush(reportEntity);
-            log.info("Запуск создания отчета" + LocalDateTime.now());
-            create(reportEntity);
-
+            taskExecutor.execute(() -> create(reportEntity));
         } catch (DataIntegrityViolationException e) {
             log.error("Попытка создания дубликата отчета");
             throw new ValidationError("Данный отчет уже создан");
@@ -102,7 +101,7 @@ public class ReportService implements IReportService {
         return new InputStreamResource(new ByteArrayInputStream(excelFileMaker.loadFile(String.valueOf(uuid))));
     }
 
-    @Async
+
     @Transactional
     private void create(ReportEntity reportEntity) {
         boolean shouldMakeFile = false;

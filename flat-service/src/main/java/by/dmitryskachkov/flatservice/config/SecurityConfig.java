@@ -49,7 +49,7 @@ public class SecurityConfig {
                 });
 
         http.authorizeRequests(requests -> requests
-                .anyRequest().authenticated()
+                .requestMatchers("/flats").authenticated()
         );
 
         // Add JWT token filter

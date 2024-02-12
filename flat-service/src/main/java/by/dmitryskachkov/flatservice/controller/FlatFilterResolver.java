@@ -1,4 +1,4 @@
-package by.dmitryskachkov.flatservice.controller.resolver;
+package by.dmitryskachkov.flatservice.controller;
 
 import by.dmitryskachkov.flatservice.core.dto.FlatFilter;
 import org.springframework.core.MethodParameter;
@@ -10,9 +10,11 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
-public class FlatParamResolver implements HandlerMethodArgumentResolver {
+public class FlatFilterResolver implements HandlerMethodArgumentResolver {
+
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.getParameterType().equals(FlatFilter.class);
@@ -24,12 +26,12 @@ public class FlatParamResolver implements HandlerMethodArgumentResolver {
 
         flatFilter.setPage(getParameter(webRequest, "page", 1));
         flatFilter.setSize(getParameter(webRequest, "size", 20));
-        flatFilter.setPriceFrom(getParameter(webRequest, "price[from]", 0));
-        flatFilter.setPriceTo(getParameter(webRequest, "price[to]", Integer.MAX_VALUE));
-        flatFilter.setBedroomsFrom(getParameter(webRequest, "bedrooms[from]", 0));
-        flatFilter.setBedroomsTo(getParameter(webRequest, "bedrooms[to]", Integer.MAX_VALUE));
-        flatFilter.setAreaFrom(getParameter(webRequest, "area[from]", 0.0f));
-        flatFilter.setAreaTo(getParameter(webRequest, "area[to]", Float.MAX_VALUE));
+        flatFilter.setPriceFrom(getParameter(webRequest, "priceFrom", 0));
+        flatFilter.setPriceTo(getParameter(webRequest, "priceTo", Integer.MAX_VALUE));
+        flatFilter.setBedroomsFrom(getParameter(webRequest, "bedroomsFrom", 0));
+        flatFilter.setBedroomsTo(getParameter(webRequest, "bedroomsTo", Integer.MAX_VALUE));
+        flatFilter.setAreaFrom(getParameter(webRequest, "areaFrom", 0.0f));
+        flatFilter.setAreaTo(getParameter(webRequest, "areaTo", Float.MAX_VALUE));
         flatFilter.setFloors(getParameterList(webRequest, "floors"));
         flatFilter.setPhoto(getParameter(webRequest, "photo", false));
 
@@ -53,6 +55,8 @@ public class FlatParamResolver implements HandlerMethodArgumentResolver {
 
     private List<Integer> getParameterList(NativeWebRequest webRequest, String paramName) {
         String[] paramValues = webRequest.getParameterValues(paramName);
-        return paramValues != null ? Arrays.asList(paramValues).stream().map(Integer::parseInt).toList() : null;
+        return paramValues != null ? Arrays.stream(paramValues).map(Integer::parseInt).collect(Collectors.toList()) : null;
     }
 }
+
+

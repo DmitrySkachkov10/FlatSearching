@@ -1,6 +1,7 @@
 package by.dmitryskachkov.flatservice.core.dto;
 
 import lombok.*;
+
 import java.util.List;
 
 @NoArgsConstructor
@@ -14,19 +15,20 @@ public class FlatFilter {
 
     private int size;
 
-    private int priceFrom;
+    private int priceFrom; //yes
 
-    private int priceTo;
+    private int priceTo; //yes
 
-    private int bedroomsFrom;
+    private int bedroomsFrom; //yes
 
-    private int bedroomsTo;
+    private int bedroomsTo; //yes
 
-    private float areaFrom;
+    private float areaFrom; //yes
 
-    private float areaTo;
+    private float areaTo;//yes
 
-    private List<Integer> floors;
+    private List<Integer> floors; //yes
 
-    private boolean photo;
+    private boolean photo; //yes
+
 }

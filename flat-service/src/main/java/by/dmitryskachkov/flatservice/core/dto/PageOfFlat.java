@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Data
+@AllArgsConstructor
 public class PageOfFlat {
     private int number;
     private int size;

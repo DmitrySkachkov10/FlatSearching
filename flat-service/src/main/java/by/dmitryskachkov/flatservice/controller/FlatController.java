@@ -3,6 +3,7 @@ package by.dmitryskachkov.flatservice.controller;
 import by.dmitryskachkov.flatservice.core.dto.FlatFilter;
 import by.dmitryskachkov.flatservice.core.dto.PageOfFlat;
 import by.dmitryskachkov.flatservice.service.api.IFlatService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +21,8 @@ public class FlatController {
     }
 
     @GetMapping
-    public ResponseEntity<PageOfFlat> getFlats(@RequestParam FlatFilter flatFilter) {
-        return new ResponseEntity<>(flatService.getPageOfFlat(flatFilter));
+    public ResponseEntity<PageOfFlat> getFlats(FlatFilter flatFilter) {
+        return new ResponseEntity<>(flatService.getPageOfFlat(flatFilter), HttpStatus.OK);
     }
+
 }

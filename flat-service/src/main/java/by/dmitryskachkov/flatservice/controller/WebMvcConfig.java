@@ -1,4 +1,4 @@
-package by.dmitryskachkov.flatservice.controller.resolver;
+package by.dmitryskachkov.flatservice.controller;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -11,6 +11,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new FlatParamResolver());
+        resolvers.add(new FlatFilterResolver());
     }
 }

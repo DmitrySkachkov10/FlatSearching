@@ -11,12 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class MainService {
     private final RealtByParser realtByParser;
 
-    private final PhotoRepo photoRepo;
     private final SaveService saveService;
 
-    public MainService(RealtByParser realtByParser, PhotoRepo photoRepo, SaveService saveService) {
+    public MainService(RealtByParser realtByParser, SaveService saveService) {
         this.realtByParser = realtByParser;
-        this.photoRepo = photoRepo;
         this.saveService = saveService;
     }
 
@@ -27,7 +25,7 @@ public class MainService {
         realtByParser.startFlatRentForDayParsing();
         realtByParser.startFlatRentForLongParsing();
         realtByParser.startFlatSalesParsing();
-        photoRepo.removeDuplicatePhotos();
+
         System.out.println("end");
     }
 }

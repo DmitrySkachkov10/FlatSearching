@@ -11,7 +11,7 @@ import java.util.UUID;
 
 
 @Entity
-@Table(schema = "flat", name = "flat")
+@Table(schema = "flats", name = "flat")
 public class FlatEntity {
 
     @Column(name = "original_url")
@@ -32,12 +32,12 @@ public class FlatEntity {
     private String price; //todo sdelat`
     private float area; //todo yes
     @OneToMany(mappedBy = "flat", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Photo> photos;  //todo yes
+    private Set<Photos> photos;  //todo yes
 
     public FlatEntity() {
     }
 
-    public FlatEntity(UUID uuid, LocalDateTime createDate, LocalDateTime updateDate, OfferType offerType, String description, int floor, int bedrooms, String originalUrl, String price, float area, Set<Photo> photos) {
+    public FlatEntity(UUID uuid, LocalDateTime createDate, LocalDateTime updateDate, OfferType offerType, String description, int floor, int bedrooms, String originalUrl, String price, float area, Set<Photos> photos) {
         this.uuid = uuid;
         this.createDate = createDate;
         this.updateDate = updateDate;
@@ -131,11 +131,11 @@ public class FlatEntity {
         this.area = area;
     }
 
-    public Set<Photo> getPhotos() {
+    public Set<Photos> getPhotos() {
         return photos;
     }
 
-    public void setPhotos(Set<Photo> photos) {
+    public void setPhotos(Set<Photos> photos) {
         this.photos = photos;
     }
 

@@ -4,10 +4,10 @@ import by.dmitryskachkov.core.RandomUserAgents;
 import by.dmitryskachkov.core.enums.OfferType;
 import by.dmitryskachkov.core.util.NumberUtils;
 import by.dmitryskachkov.core.util.FindData;
-import by.dmitryskachkov.entity.SystemError;
+import by.dmitryskachkov.repo.api.PhotoRepo;
 import by.dmitryskachkov.repo.entity.FlatEntity;
-import by.dmitryskachkov.repo.entity.Photo;
-import lombok.extern.slf4j.Slf4j;
+
+import by.dmitryskachkov.repo.entity.Photos;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -24,7 +24,6 @@ import java.util.concurrent.*;
 
 @Service
 @EnableAsync
-@Slf4j
 public class RealtByParser {
     @Value("${app.urls.realt.basic}")
     private String basicUrl;
@@ -36,6 +35,8 @@ public class RealtByParser {
     @Value("${app.urls.realt.sales}")
     private String salesUrl;
 
+    private final PhotoRepo photoRepo;
+
 
     private int PAGE_SIZE = 30;
 
@@ -46,7 +47,8 @@ public class RealtByParser {
 
     private final SaveService saveService;
 
-    public RealtByParser(SaveService saveService) {
+    public RealtByParser(PhotoRepo photoRepo, SaveService saveService) {
+        this.photoRepo = photoRepo;
         this.saveService = saveService;
     }
 
@@ -91,7 +93,9 @@ public class RealtByParser {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        log.info("All threads have finished their work.");
+        photoRepo.removeDuplicatePhotos();
+
+        System.out.println("All threads have finished their work.");
     }
 
     private void findFlatsUrls(FindData findData) {
@@ -113,10 +117,9 @@ public class RealtByParser {
                 }
 
             } catch (IOException | InterruptedException e) {
-                throw new SystemError("Ошибка в получении url из ресурса realt.by");
+                System.err.println("Error в getFlatsUrls");
             }
         }
-        log.info("stop searching new flats`s urls");
     }
 
     private void putIntoQueue(String url, OfferType offerType) throws InterruptedException {
@@ -125,6 +128,7 @@ public class RealtByParser {
         } else {
             saleLinks.put(basicUrl + url);
         }
+        System.out.println("PUTTED 1 ");
     }
 
     private void parseFlats(OfferType offerType) {
@@ -144,7 +148,7 @@ public class RealtByParser {
                 e.printStackTrace();
             }
         }
-        log.info("stop parse flats");
+        System.err.println("END SETUPS");
     }
 
     private void setUpData(String flatUrl, OfferType offerType) {
@@ -195,9 +199,10 @@ public class RealtByParser {
             }
 
             flat.setPhotos(getPhotos(document, flat));
+            System.out.println("PUTTED 2 QUEUE");
             saveService.putIntoSaveQueue(flat);
         } catch (IOException | InterruptedException error) {
-            error.printStackTrace();
+            System.err.println("error -> " + flatUrl);
         }
     }
 
@@ -243,13 +248,13 @@ public class RealtByParser {
      * @param flat     -> to set photos for this flat
      * @return Set<Photos> for this flat
      */
-    private Set<Photo> getPhotos(Document document, FlatEntity flat) {
+    private Set<Photos> getPhotos(Document document, FlatEntity flat) {
         Elements imgElements = document.select("img");
-        Set<Photo> photos = new HashSet<>();
+        Set<Photos> photos = new HashSet<>();
         for (Element imgElement : imgElements) {
             String src = imgElement.attr("src");
             if (!src.isEmpty() && !src.contains("thumb/c/160x160")) {
-                photos.add(new Photo(UUID.randomUUID(), src, flat));
+                photos.add(new Photos(UUID.randomUUID(), src, flat));
             }
         }
         return photos;

@@ -5,7 +5,6 @@ import by.dmitryskachkov.core.enums.OfferType;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -33,12 +32,12 @@ public class FlatEntity {
     private String price; //todo sdelat`
     private float area; //todo yes
     @OneToMany(mappedBy = "flat", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Photos> photos;  //todo yes
+    private Set<Photo> photos;  //todo yes
 
     public FlatEntity() {
     }
 
-    public FlatEntity(UUID uuid, LocalDateTime createDate, LocalDateTime updateDate, OfferType offerType, String description, int floor, int bedrooms, String originalUrl, String price, float area, Set<Photos> photos) {
+    public FlatEntity(UUID uuid, LocalDateTime createDate, LocalDateTime updateDate, OfferType offerType, String description, int floor, int bedrooms, String originalUrl, String price, float area, Set<Photo> photos) {
         this.uuid = uuid;
         this.createDate = createDate;
         this.updateDate = updateDate;
@@ -132,11 +131,11 @@ public class FlatEntity {
         this.area = area;
     }
 
-    public Set<Photos> getPhotos() {
+    public Set<Photo> getPhotos() {
         return photos;
     }
 
-    public void setPhotos(Set<Photos> photos) {
+    public void setPhotos(Set<Photo> photos) {
         this.photos = photos;
     }
 

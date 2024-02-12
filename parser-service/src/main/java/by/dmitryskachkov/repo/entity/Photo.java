@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Entity
 @Table(schema = "flat", name = "photos")
-public class Photos {
+public class Photo {
 
     @Id
     private UUID photo_uuid;
@@ -19,10 +19,10 @@ public class Photos {
     @JoinColumn(name = "uuid")
     private FlatEntity flat;
 
-    public Photos() {
+    public Photo() {
     }
 
-    public Photos(UUID photo_uuid, String photoUrl, FlatEntity flat) {
+    public Photo(UUID photo_uuid, String photoUrl, FlatEntity flat) {
         this.photo_uuid = photo_uuid;
         this.photoUrl = photoUrl;
         this.flat = flat;
@@ -47,8 +47,8 @@ public class Photos {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Photos photos)) return false;
-        return Objects.equals(photo_uuid, photos.photo_uuid) && Objects.equals(photoUrl, photos.photoUrl);
+        if (!(o instanceof Photo photo)) return false;
+        return Objects.equals(photo_uuid, photo.photo_uuid) && Objects.equals(photoUrl, photo.photoUrl);
     }
 
     @Override

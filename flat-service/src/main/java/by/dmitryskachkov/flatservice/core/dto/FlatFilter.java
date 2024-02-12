@@ -1,7 +1,6 @@
 package by.dmitryskachkov.flatservice.core.dto;
 
 import lombok.*;
-
 import java.util.List;
 
 @NoArgsConstructor
@@ -9,7 +8,7 @@ import java.util.List;
 @Getter
 @Setter
 @EqualsAndHashCode
-public class FlatParamsDto {
+public class FlatFilter {
 
     private int page;
 

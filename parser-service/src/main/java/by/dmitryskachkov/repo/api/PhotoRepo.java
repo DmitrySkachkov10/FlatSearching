@@ -1,6 +1,6 @@
 package by.dmitryskachkov.repo.api;
 
-import by.dmitryskachkov.repo.entity.Photos;
+import by.dmitryskachkov.repo.entity.Photo;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.UUID;
 
-public interface PhotoRepo extends JpaRepository<Photos, UUID> {
+public interface PhotoRepo extends JpaRepository<Photo, UUID> {
     @Transactional
     @Modifying
     @Query("DELETE FROM Photos p1 " +

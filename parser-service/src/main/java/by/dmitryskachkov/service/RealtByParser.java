@@ -6,7 +6,7 @@ import by.dmitryskachkov.core.util.NumberUtils;
 import by.dmitryskachkov.core.util.FindData;
 import by.dmitryskachkov.entity.SystemError;
 import by.dmitryskachkov.repo.entity.FlatEntity;
-import by.dmitryskachkov.repo.entity.Photos;
+import by.dmitryskachkov.repo.entity.Photo;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Value;
@@ -243,13 +243,13 @@ public class RealtByParser {
      * @param flat     -> to set photos for this flat
      * @return Set<Photos> for this flat
      */
-    private Set<Photos> getPhotos(Document document, FlatEntity flat) {
+    private Set<Photo> getPhotos(Document document, FlatEntity flat) {
         Elements imgElements = document.select("img");
-        Set<Photos> photos = new HashSet<>();
+        Set<Photo> photos = new HashSet<>();
         for (Element imgElement : imgElements) {
             String src = imgElement.attr("src");
             if (!src.isEmpty() && !src.contains("thumb/c/160x160")) {
-                photos.add(new Photos(UUID.randomUUID(), src, flat));
+                photos.add(new Photo(UUID.randomUUID(), src, flat));
             }
         }
         return photos;

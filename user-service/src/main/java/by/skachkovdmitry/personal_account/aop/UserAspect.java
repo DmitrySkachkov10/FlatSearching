@@ -29,14 +29,15 @@ public class UserAspect {
         Signature signature = joinPoint.getSignature();
         LogInfo logInfo = new LogInfo();
         logInfo.setEssenceType("USER");
-        logInfo.setId(signature.getName());
 
         Object result = joinPoint.proceed();
-        logInfo.setText("Пользователь вошел в систему");
-        logInfo.setUser((UserSecurity) SecurityContextHolder
+        UserSecurity userSecurity = (UserSecurity) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
-                .getPrincipal());
+                .getPrincipal();
+        logInfo.setText("Пользователь вошел в систему");
+        logInfo.setId(userSecurity.getUuid());
+        logInfo.setUser(userSecurity);
         send(logInfo);
         return result;
     }
@@ -50,10 +51,12 @@ public class UserAspect {
         try {
             Object result = joinPoint.proceed();
             logInfo.setText("Получение информации в профиле");
-            logInfo.setUser((UserSecurity) SecurityContextHolder
+            UserSecurity userSecurity = (UserSecurity) SecurityContextHolder
                     .getContext()
                     .getAuthentication()
-                    .getPrincipal());
+                    .getPrincipal();
+            logInfo.setUser(userSecurity);
+            logInfo.setId(userSecurity.getUuid());
             send(logInfo);
             return result;
         } catch (Error e) {
@@ -66,9 +69,12 @@ public class UserAspect {
 
     private void send(LogInfo logInfo) {
         try {
+            if (logInfo.getUser() == null) {
+                return;
+            }
             logService.send(logInfo);
         } catch (RetryableException e) {
-          log.error("Нет подключения к audit-service, данные не отправлены");
+            log.error("Нет подключения к audit-service, данные не отправлены");
         }
     }
 

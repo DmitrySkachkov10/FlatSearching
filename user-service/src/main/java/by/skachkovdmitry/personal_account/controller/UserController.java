@@ -34,18 +34,18 @@ public class UserController {
     @GetMapping("/verification")
     public ResponseEntity<?> verify(@RequestParam String mail, @RequestParam String code) {
         authenticationService.verify(new MailVerifyDTO(code, mail));
-        return new ResponseEntity<>("Пользователь верифицирован", HttpStatus.ACCEPTED);
+        return new ResponseEntity<>("Пользователь верифицирован", HttpStatus.OK);
     }
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody UserLogin userLogin) {
         String token = authenticationService.logIn(userLogin);
-        return new ResponseEntity<>(token, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(token, HttpStatus.OK);
 
     }
 
     @GetMapping("/me")
     public ResponseEntity<?> getInfo() {
-        return new ResponseEntity<>(authenticationService.myInfo(), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(authenticationService.myInfo(), HttpStatus.OK);
     }
 }

@@ -5,6 +5,7 @@ import by.skachkovdmitry.personal_account.core.dto.LogInfo;
 import by.skachkovdmitry.personal_account.core.dto.security.UserSecurity;
 import by.skachkovdmitry.personal_account.service.api.feign.LogService;
 import feign.RetryableException;
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-@Slf4j
+@Log4j2
 public class AdminAspect {
     private final LogService logService;
 
@@ -55,11 +56,12 @@ public class AdminAspect {
         Signature signature = joinPoint.getSignature();
         LogInfo logInfo = new LogInfo();
         logInfo.setEssenceType("ADMIN");
-        logInfo.setUser((UserSecurity) SecurityContextHolder
+        UserSecurity userSecurity = (UserSecurity) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
-                .getPrincipal());
-        logInfo.setId(signature.getName());
+                .getPrincipal();
+        logInfo.setUser(userSecurity);
+        logInfo.setId(userSecurity.getUuid());
 
         try {
             Object result = joinPoint.proceed();

@@ -5,6 +5,7 @@ import by.skachkovdmitry.personal_account.core.dto.LogInfo;
 import by.skachkovdmitry.personal_account.core.dto.security.UserSecurity;
 import by.skachkovdmitry.personal_account.service.api.feign.LogService;
 import feign.RetryableException;
+import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-@Log4j2
+@Slf4j
 public class AdminAspect {
     private final LogService logService;
 

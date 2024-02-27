@@ -4,6 +4,7 @@ import by.skachkovdmitry.audit.core.dto.Audit;
 import by.skachkovdmitry.audit.core.dto.PageOfAudit;
 import by.skachkovdmitry.audit.service.api.IAuditService;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,11 +25,11 @@ public class AuditController {
     @GetMapping
     public ResponseEntity<PageOfAudit> getPage(@RequestParam int page, @RequestParam int size) {
         PageOfAudit pageOfAudit = auditService.getPageOfAudit(PageRequest.of(page - 1, size));
-        return new ResponseEntity<>(pageOfAudit, HttpStatusCode.valueOf(200));
+        return new ResponseEntity<>(pageOfAudit, HttpStatus.OK);
     }
 
     @GetMapping("/{uuid}")
     public ResponseEntity<Audit> getByUuid(@PathVariable UUID uuid) {
-        return new ResponseEntity<>(auditService.getAudit(uuid), HttpStatusCode.valueOf(200));
+        return new ResponseEntity<>(auditService.getAudit(uuid), HttpStatus.OK);
     }
 }

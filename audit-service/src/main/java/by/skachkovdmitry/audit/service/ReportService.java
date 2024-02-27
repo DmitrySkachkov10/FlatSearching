@@ -1,8 +1,5 @@
 package by.skachkovdmitry.audit.service;
 
-
-import by.dmitryskachkov.entity.SystemError;
-import by.dmitryskachkov.entity.ValidationError;
 import by.skachkovdmitry.audit.core.dto.PageOfReport;
 import by.skachkovdmitry.audit.core.dto.Report;
 import by.skachkovdmitry.audit.core.dto.UserActionAuditParam;
@@ -16,7 +13,6 @@ import by.skachkovdmitry.audit.service.api.IReportService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -60,13 +56,12 @@ public class ReportService implements IReportService {
                 userActionAuditParam.getUserUuid(),
                 userActionAuditParam.getFrom().atStartOfDay(),
                 userActionAuditParam.getTo().atStartOfDay());
-        try {
-            reportRepo.saveAndFlush(reportEntity);
-            taskExecutor.execute(() -> create(reportEntity));
-        } catch (DataIntegrityViolationException e) {
-            log.error("Попытка создания дубликата отчета");
-            throw new ValidationError("Данный отчет уже создан");
-        }
+
+        reportRepo.saveAndFlush(reportEntity);
+        taskExecutor.execute(() -> create(reportEntity));
+        //todo exceptions
+
+
     }
 
     @Override

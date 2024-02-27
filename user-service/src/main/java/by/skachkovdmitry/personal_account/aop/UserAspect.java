@@ -16,7 +16,7 @@ import org.aspectj.lang.annotation.Aspect;
 
 @Aspect
 @Component
-@Log4j2
+@Slf4j
 public class UserAspect {
 
     private final LogService logService;

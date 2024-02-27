@@ -88,7 +88,7 @@ public class AuditService implements IAuditService {
         try {
             return auditRepo.findAuditsForUsersBetweenDates(usersUuid, startDate, endDate);
         } catch (Exception e){
-            throw new ValidationError("Неверный формат 'from' or 'to'");
+            throw new ValidationError("Запрос некорректен. Сервер не может обработать запрос");
         }
     }
 }

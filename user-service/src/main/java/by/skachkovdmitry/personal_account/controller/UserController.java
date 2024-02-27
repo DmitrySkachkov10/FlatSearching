@@ -40,7 +40,7 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody UserLogin userLogin) {
         String token = authenticationService.logIn(userLogin);
-        return new ResponseEntity<>(token, HttpStatus.OK);
+        return new ResponseEntity<>("Вход выполнен. Токен для Authorization Header:\n" + token, HttpStatus.OK);
 
     }
 

@@ -26,7 +26,7 @@ public class AdminController {
     @PostMapping
     public ResponseEntity<String> create(@RequestBody UserCreate userCreate) {
         adminService.create(userCreate);
-        return new ResponseEntity<>("Пользователь создан", HttpStatus.CREATED);
+        return new ResponseEntity<>("Пользователь добавлен", HttpStatus.CREATED);
     }
 
 
@@ -48,6 +48,6 @@ public class AdminController {
 
 
         adminService.update(userCreate, uuid, dt_update);
-        return new ResponseEntity<>("Обновлен",  HttpStatus.OK);
+        return new ResponseEntity<>("Пользователь обновлён",  HttpStatus.OK);
     }
 }

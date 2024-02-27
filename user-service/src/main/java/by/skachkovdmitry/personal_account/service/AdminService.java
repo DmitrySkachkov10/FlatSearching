@@ -81,7 +81,7 @@ public class AdminService implements IAdminService {
         System.out.println(latestUpdateTime + " " + lastUpdateTime);
 
         if (!latestUpdateTime.equals(lastUpdateTime)) {
-            throw new ValidationError("Файл уже редактировался");
+            throw new ValidationError("Запрос некорректен. Сервер не может обработать запрос");
         }
 
         userEntity.setFio(userCreate.getFio());
@@ -94,7 +94,7 @@ public class AdminService implements IAdminService {
         try {
             userService.update(userEntity);
         } catch (OptimisticEntityLockException e) {
-            throw new ValidationError("Файл уже редактировался");
+            throw new ValidationError("Запрос некорректен. Сервер не может обработать запрос");
         }
     }
 }

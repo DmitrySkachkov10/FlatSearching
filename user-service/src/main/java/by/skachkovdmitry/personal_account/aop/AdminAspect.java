@@ -79,6 +79,7 @@ public class AdminAspect {
     private void send(LogInfo logInfo) {
         try {
             logService.send(logInfo);
+            log.info("данные отправлены на микросервис audit-service");
         }catch (RetryableException e) {
            log.error("Нет подключения к audit-service, данные не отправлены");
         }

@@ -11,33 +11,34 @@ import java.util.UUID;
 
 
 @Entity
-@Table(schema = "flats", name = "flat")
-public class FlatEntity {
+@Table(schema = "flat", name = "flat")
+public class Flat {
 
     @Column(name = "original_url")
     @Id
-    private String originalUrl;  //todo yes
+    private String originalUrl;
+
+
     private UUID uuid;
     @Column(name = "dt_create")
-    private LocalDateTime createDate;//todo yes
+    private LocalDateTime createDate;
     @Column(name = "dt_update")
     @Version
-    private LocalDateTime updateDate;//todo yes
+    private LocalDateTime updateDate;
     @Enumerated(EnumType.STRING)
-    private OfferType offerType; //todo yes
+    private OfferType offerType;
     private String description; //todo sdelat`
-    private int floor;//todo yes
-    private int bedrooms;//todo yes
-
-    private String price; //todo sdelat`
-    private float area; //todo yes
+    private int floor;
+    private int bedrooms;
+    private String price;
+    private float area;
     @OneToMany(mappedBy = "flat", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Photos> photos;  //todo yes
+    private Set<Photo> photos;
 
-    public FlatEntity() {
+    public Flat() {
     }
 
-    public FlatEntity(UUID uuid, LocalDateTime createDate, LocalDateTime updateDate, OfferType offerType, String description, int floor, int bedrooms, String originalUrl, String price, float area, Set<Photos> photos) {
+    public Flat(UUID uuid, LocalDateTime createDate, LocalDateTime updateDate, OfferType offerType, String description, int floor, int bedrooms, String originalUrl, String price, float area, Set<Photo> photos) {
         this.uuid = uuid;
         this.createDate = createDate;
         this.updateDate = updateDate;
@@ -131,18 +132,18 @@ public class FlatEntity {
         this.area = area;
     }
 
-    public Set<Photos> getPhotos() {
+    public Set<Photo> getPhotos() {
         return photos;
     }
 
-    public void setPhotos(Set<Photos> photos) {
+    public void setPhotos(Set<Photo> photos) {
         this.photos = photos;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof FlatEntity that)) return false;
+        if (!(o instanceof Flat that)) return false;
         return floor == that.floor && bedrooms == that.bedrooms && Float.compare(area, that.area) == 0 && Objects.equals(uuid, that.uuid) && Objects.equals(createDate, that.createDate) && Objects.equals(updateDate, that.updateDate) && offerType == that.offerType && Objects.equals(description, that.description) && Objects.equals(originalUrl, that.originalUrl) && Objects.equals(price, that.price);
     }
 
@@ -154,17 +155,7 @@ public class FlatEntity {
     @Override
     public String toString() {
         return "FlatEntity{" +
-                "uuid=" + uuid +
-                ", createDate=" + createDate +
-                ", updateDate=" + updateDate +
-                ", offerType=" + offerType +
-                ", description='" + description + '\'' +
-                ", floor=" + floor +
-                ", bedrooms=" + bedrooms +
-                ", originalUrl='" + originalUrl + '\'' +
-                ", price='" + price + '\'' +
-                ", area=" + area +
-                '}';
+                ", originalUrl='" + originalUrl;
     }
 }
 

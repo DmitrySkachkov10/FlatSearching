@@ -8,6 +8,7 @@ import by.dmitryskachkov.entity.SystemError;
 import by.dmitryskachkov.repo.entity.Flat;
 import by.dmitryskachkov.repo.entity.Photo;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -93,7 +95,7 @@ public class RealByParser {
             e.printStackTrace();
         }
 
-        log.info("All threads have finished their work.");
+        log.info("All threads have finished their work at: " + LocalDateTime.now());
     }
 
     private void findFlatsUrls(FindData findData) {
@@ -114,11 +116,10 @@ public class RealByParser {
                     putIntoQueue(findUrl, findData.getOfferType());
                 }
 
-            } catch (IOException | InterruptedException e) {
-                throw new SystemError("Ошибка в получении url из ресурса realt.by");
+            } catch (InterruptedException | IOException e) {
+                log.error("Ошибка в получении url из ресурса realt.by" + e);
             }
         }
-
     }
 
     private void putIntoQueue(String url, OfferType offerType) throws InterruptedException {
@@ -141,14 +142,16 @@ public class RealByParser {
                 if (url == null || url.isEmpty()) {
                     break;
                 }
-                Flat flat = setUpData(url, offerType);
-                System.out.println(flat.toString());
+                Flat flat;
+                if ((flat = setUpData(url, offerType)) == null) {
+                    continue;
+                }
                 saveService.putIntoSaveQueue(flat);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        log.info("stop parse flats");
+        log.info("stop parse flats at: " + LocalDateTime.now());
     }
 
     private Flat setUpData(String flatUrl, OfferType offerType) {
@@ -193,15 +196,14 @@ public class RealByParser {
 
             Elements elements = document.select("h2");
             if (elements.isEmpty()) {
-                flat.setPrice("Договорная");
+                flat.setPrice(-1);
             } else {
-                flat.setPrice(elements.get(0).text());
+                flat.setPrice(Integer.parseInt(elements.get(0).text().replaceAll("[^0-9]", "")));
             }
-
             flat.setPhotos(getPhotos(document, flat));
             return flat;
-        } catch (IOException | InterruptedException error) {
-            error.printStackTrace();
+        } catch (InterruptedException | IOException e) {
+            log.error("An error occurred:" + e);
         }
         return null;
     }
@@ -221,18 +223,11 @@ public class RealByParser {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("An error occurred:" + e);
         }
         return 0;
     }
 
-
-    /**
-     * @param yourIteration iteration where you now
-     * @param iteration     sleep on this itration
-     *                      you will sleep 1 minute if your iteration == iteration
-     * @throws InterruptedException
-     */
     private void sleepIteration(int yourIteration, int iteration) throws InterruptedException {
         if (yourIteration > 0 && (yourIteration % iteration == 0)) {
             Thread.sleep(60000);
@@ -253,7 +248,7 @@ public class RealByParser {
         Set<Photo> photos = new HashSet<>();
         for (Element imgElement : imgElements) {
             String src = imgElement.attr("src");
-            if (!src.isEmpty() && !src.contains("thumb/c/160x160")) {
+            if (!src.isEmpty() && !src.contains("thumb/c/160x160") && src.contains(".jpg")) {
                 photos.add(new Photo(UUID.randomUUID(), src, flat));
             }
         }

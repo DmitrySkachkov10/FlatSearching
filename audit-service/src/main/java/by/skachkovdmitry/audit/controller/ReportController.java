@@ -11,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -28,13 +27,13 @@ public class ReportController {
     public ResponseEntity<String> addReport(@PathVariable("type") String type,
                                             @RequestBody UserActionAuditParam userActionAuditParam) {
         reportService.addReport(userActionAuditParam);
-        return new ResponseEntity<>("Отчёт запущен", HttpStatus.ACCEPTED);
+        return new ResponseEntity<>("Отчёт запущен", HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<PageOfReport> getReports(int page, int size) {
         PageOfReport pageOfReport = reportService.getReports(PageRequest.of(page, size));
-        return new ResponseEntity<>(pageOfReport, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(pageOfReport, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{uuid}/export", method = RequestMethod.HEAD)

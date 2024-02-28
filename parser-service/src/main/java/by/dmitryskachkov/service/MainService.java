@@ -27,8 +27,9 @@ public class MainService {
         realByParser.startFlatRentForDayParsing();
         realByParser.startFlatRentForLongParsing();
         realByParser.startFlatSalesParsing();
-        new Thread(saveService::save).start();
-        Thread.sleep(30000);
+        Thread thread = new Thread(saveService::save);
+        thread.start();
+        thread.join();
         new Thread(photoRepo::removeDuplicatePhotos).start();
         System.out.println("end");
     }

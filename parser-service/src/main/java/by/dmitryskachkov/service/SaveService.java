@@ -3,7 +3,6 @@ package by.dmitryskachkov.service;
 import by.dmitryskachkov.repo.api.IFlatRepository;
 import by.dmitryskachkov.repo.entity.Flat;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,36 +31,38 @@ public class SaveService {
         }
     }
 
-    public void save() {
+    public Runnable save() {
         try {
             while (true) {
                 Flat flat = allFlats.poll(10, TimeUnit.SECONDS);
-                if (flat != null) {
-                    Flat existingFlat = flatRepo.findByOriginalUrl(flat.getOriginalUrl());
-                    if (existingFlat != null) {
-                        if (!Objects.equals(existingFlat.getPrice(), flat.getPrice())) {
-                            existingFlat.setPrice(flat.getPrice());
-                            existingFlat.setUpdateDate(LocalDateTime.now());
-                            save(existingFlat);
-                            System.out.println("Update existing flat");
-                        } else {
-                            System.out.println("Flat with same original_url and same price already exists. Skipping...");
-                        }
-                    } else {
-                        // Объекта с таким original_url нет, сохраняем новый
-                        save(flat);
-                        System.out.println("Save new flat");
-                    }
-                } else {
-                    System.out.println("No flats found in queue. Exiting...");
+                if (flat == null) {
+                    log.info("Exiting...");
                     break;
+                }
+
+                Flat existingFlat = flatRepo.findByOriginalUrl(flat.getOriginalUrl());
+                if (existingFlat != null && Objects.equals(existingFlat.getPrice(), flat.getPrice())) {
+                    log.info("SAME");
+                    continue;
+                }
+
+                if (existingFlat != null) {
+                    existingFlat.setPrice(flat.getPrice());
+                    existingFlat.setUpdateDate(LocalDateTime.now());
+                    save(existingFlat);
+                    log.info("Update");
+                } else {
+                    save(flat);
+                    log.info("Save");
                 }
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            System.err.println("Interrupted while waiting for flats in queue.");
+            log.error("Interrupted while waiting for flats in queue.", e);
         }
+        return null;
     }
+
 
     @Transactional
     private void save(Flat flat) {

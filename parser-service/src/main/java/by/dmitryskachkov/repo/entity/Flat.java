@@ -30,7 +30,7 @@ public class Flat {
     private String description; //todo sdelat`
     private int floor;
     private int bedrooms;
-    private String price;
+    private int price;
     private float area;
     @OneToMany(mappedBy = "flat", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Photo> photos;
@@ -38,7 +38,7 @@ public class Flat {
     public Flat() {
     }
 
-    public Flat(UUID uuid, LocalDateTime createDate, LocalDateTime updateDate, OfferType offerType, String description, int floor, int bedrooms, String originalUrl, String price, float area, Set<Photo> photos) {
+    public Flat(UUID uuid, LocalDateTime createDate, LocalDateTime updateDate, OfferType offerType, String description, int floor, int bedrooms, String originalUrl, int price, float area, Set<Photo> photos) {
         this.uuid = uuid;
         this.createDate = createDate;
         this.updateDate = updateDate;
@@ -116,11 +116,11 @@ public class Flat {
         this.originalUrl = originalUrl;
     }
 
-    public String getPrice() {
+    public int getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(int price) {
         this.price = price;
     }
 

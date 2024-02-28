@@ -9,9 +9,9 @@
     </parent>
 
     <groupId>by.dmitryskachkov</groupId>
-    <artifactId>flat-service</artifactId>
+    <artifactId>flatDTO-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>flat-service</name>
+    <name>flatDTO-service</name>
 
     <properties>
         <java.version>17</java.version>

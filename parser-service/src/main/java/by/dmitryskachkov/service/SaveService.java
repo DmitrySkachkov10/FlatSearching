@@ -42,7 +42,7 @@ public class SaveService {
 
                 Flat existingFlat = flatRepo.findByOriginalUrl(flat.getOriginalUrl());
                 if (existingFlat != null && Objects.equals(existingFlat.getPrice(), flat.getPrice())) {
-                    log.info("SAME");
+                  //todo same
                     continue;
                 }
 
@@ -50,10 +50,10 @@ public class SaveService {
                     existingFlat.setPrice(flat.getPrice());
                     existingFlat.setUpdateDate(LocalDateTime.now());
                     save(existingFlat);
-                    log.info("Update");
+                    //todo update
                 } else {
                     save(flat);
-                    log.info("Save");
+                    //todo save
                 }
             }
         } catch (InterruptedException e) {
@@ -69,7 +69,7 @@ public class SaveService {
         try {
             flatRepo.save(flat);
         } catch (Throwable e) {
-            System.err.println(e.getMessage());
+            log.error("Exception: " + e);
         }
     }
 

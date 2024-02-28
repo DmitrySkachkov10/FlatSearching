@@ -26,7 +26,7 @@ public class FlatFilterResolver implements HandlerMethodArgumentResolver {
 
         flatFilter.setPage(getParameter(webRequest, "page", 1));
         flatFilter.setSize(getParameter(webRequest, "size", 20));
-        flatFilter.setPriceFrom(getParameter(webRequest, "priceFrom", 0));
+        flatFilter.setPriceFrom(getParameter(webRequest, "priceFrom", -1));
         flatFilter.setPriceTo(getParameter(webRequest, "priceTo", Integer.MAX_VALUE));
         flatFilter.setBedroomsFrom(getParameter(webRequest, "bedroomsFrom", 0));
         flatFilter.setBedroomsTo(getParameter(webRequest, "bedroomsTo", Integer.MAX_VALUE));

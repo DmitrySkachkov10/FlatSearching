@@ -3,7 +3,6 @@ package by.skachkovdmitry.personal_account.service;
 
 import by.skachkovdmitry.personal_account.core.dto.*;
 import by.dmitryskachkov.entity.*;
-import by.skachkovdmitry.personal_account.core.role.Roles;
 import by.skachkovdmitry.personal_account.core.status.Status;
 import by.skachkovdmitry.personal_account.repo.api.IUserRepo;
 import by.skachkovdmitry.personal_account.repo.entity.UserEntity;
@@ -59,11 +58,14 @@ public class UserService implements IUserService {
         if (user != null) {
             if (user.getStatus() != Status.WAITING_ACTIVATION) {
                 return user;
-            } else {
+            } else if (user.getStatus() == Status.WAITING_ACTIVATION){
                 throw new VerificationError("Пользователь не прошел верификацию");
+            } else {
+                throw new VerificationError("DEACTIVED");
             }
+
         }
-        throw new ValidationError("Неверные данные для входа");
+        throw new ValidationError("Запрос некорректен. Сервер не может обработать запрос");
     }
 
     @Override
@@ -105,7 +107,7 @@ public class UserService implements IUserService {
         if (userEntity != null) {
             return userEntity;
         } else {
-            throw new ValidationError("Неверное данные");
+            throw new ValidationError("Запрос некорректен. Сервер не может обработать запрос");
         }
     }
 

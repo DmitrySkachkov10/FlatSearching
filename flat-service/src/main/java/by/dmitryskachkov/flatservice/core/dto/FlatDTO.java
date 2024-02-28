@@ -11,12 +11,13 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Flat {
+public class FlatDTO {
 
     private UUID uuid;
 
@@ -40,7 +41,7 @@ public class Flat {
 
     private int floor;
 
-    private List<String> photoUrls;
+    private Set<String> photos;
 
     private String originalUrl;
 }

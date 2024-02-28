@@ -67,4 +67,14 @@ public class LogInfo {
     public int hashCode() {
         return Objects.hash(user, essenceType, text, id);
     }
+
+    @Override
+    public String toString() {
+        return "LogInfo{" +
+                "user=" + user +
+                ", essenceType='" + essenceType + '\'' +
+                ", text='" + text + '\'' +
+                ", id='" + id + '\'' +
+                '}';
+    }
 }

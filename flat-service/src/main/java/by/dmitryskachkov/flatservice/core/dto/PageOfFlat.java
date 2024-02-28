@@ -21,6 +21,6 @@ public class PageOfFlat {
 
     private boolean last;
 
-    private List<Flat> content;
+    private List<FlatDTO> content;
 
 }

@@ -29,13 +29,20 @@ public class MainService {
     public void realByParser() throws InterruptedException {
         System.out.println("start realt.by parsing at: " + LocalDateTime.now());
         log.info("start realt.by parsing at: " + LocalDateTime.now());
-        realByParser.startFlatRentForDayParsing();
-        realByParser.startFlatRentForLongParsing();
+
+//        realByParser.startFlatRentForDayParsing();
+//        realByParser.startFlatRentForLongParsing();
         realByParser.startFlatSalesParsing();
-        Thread thread = new Thread(saveService::save);
-        thread.start();
-        thread.join();
-        new Thread(photoRepo::removeDuplicatePhotos).start();
+
+        Thread saveThread = new Thread(saveService::save);
+        Thread photoThread = new Thread(photoRepo::removeDuplicatePhotos);
+
+        saveThread.start();
+        photoThread.start();
+
+        saveThread.join();
+        photoThread.join();
+
         System.out.println("end of parsing at: " + LocalDateTime.now());
         log.info("end of parsing at: " + LocalDateTime.now());
     }

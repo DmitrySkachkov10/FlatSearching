@@ -30,8 +30,8 @@ public class MainService {
         System.out.println("start realt.by parsing at: " + LocalDateTime.now());
         log.info("start realt.by parsing at: " + LocalDateTime.now());
 
-//        realByParser.startFlatRentForDayParsing();
-//        realByParser.startFlatRentForLongParsing();
+        realByParser.startFlatRentForDayParsing();
+        realByParser.startFlatRentForLongParsing();
         realByParser.startFlatSalesParsing();
 
         Thread saveThread = new Thread(saveService::save);

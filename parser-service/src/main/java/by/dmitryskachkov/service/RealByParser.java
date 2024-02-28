@@ -4,11 +4,9 @@ import by.dmitryskachkov.core.RandomUserAgents;
 import by.dmitryskachkov.core.enums.OfferType;
 import by.dmitryskachkov.core.util.FindData;
 import by.dmitryskachkov.core.util.NumberUtils;
-import by.dmitryskachkov.entity.SystemError;
 import by.dmitryskachkov.repo.entity.Flat;
 import by.dmitryskachkov.repo.entity.Photo;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -100,7 +98,7 @@ public class RealByParser {
 
     private void findFlatsUrls(FindData findData) {
 
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < findData.getPageCountForThread(); i++) {
             try {
                 int pageNumber = findData.getStartPage() + i;
                 if (findData.getPageCount() < pageNumber) {
@@ -135,9 +133,9 @@ public class RealByParser {
             try {
                 String url;
                 if (offerType.equals(OfferType.RENT) || offerType.equals(OfferType.RENT_FOR_DAY)) {
-                    url = rentLinks.poll(30, TimeUnit.SECONDS);
+                    url = rentLinks.poll(60, TimeUnit.SECONDS);
                 } else {
-                    url = saleLinks.poll(30, TimeUnit.SECONDS);
+                    url = saleLinks.poll(60, TimeUnit.SECONDS);
                 }
                 if (url == null || url.isEmpty()) {
                     break;
@@ -157,7 +155,7 @@ public class RealByParser {
     private Flat setUpData(String flatUrl, OfferType offerType) {
         Flat flat = new Flat();
         try {
-            Thread.sleep(50);
+            Thread.sleep(10);
             flat.setUuid(UUID.randomUUID());
             flat.setCreateDate(LocalDateTime.now());
             flat.setUpdateDate(LocalDateTime.now());
@@ -230,7 +228,7 @@ public class RealByParser {
 
     private void sleepIteration(int yourIteration, int iteration) throws InterruptedException {
         if (yourIteration > 0 && (yourIteration % iteration == 0)) {
-            Thread.sleep(60000);
+            Thread.sleep(20000);
         }
     }
 

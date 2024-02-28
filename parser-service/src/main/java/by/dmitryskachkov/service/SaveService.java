@@ -34,7 +34,7 @@ public class SaveService {
     public Runnable save() {
         try {
             while (true) {
-                Flat flat = allFlats.poll(10, TimeUnit.SECONDS);
+                Flat flat = allFlats.poll(90, TimeUnit.SECONDS);
                 if (flat == null) {
                     log.info("Exiting...");
                     break;

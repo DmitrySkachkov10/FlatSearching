@@ -8,7 +8,6 @@ public class NumberUtils {
         if (!numericValue.isEmpty()) {
             try {
                 if (numericValue.contains(".")) {
-                    System.out.println("numericValue - " + numericValue.toUpperCase());
                     return Float.parseFloat(numericValue);
                 } else {
                     return Integer.parseInt(numericValue);

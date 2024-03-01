@@ -1,9 +1,12 @@
 package by.dmitryskachkov.flatservice.core.filter;
 
+import by.dmitryskachkov.entity.Error;
 import by.dmitryskachkov.entity.TokenError;
 
 import by.dmitryskachkov.flatservice.core.dto.UserSecurity;
 import by.dmitryskachkov.flatservice.core.utils.JwtTokenHandler;
+import by.dmitryskachkov.flatservice.service.api.IFlatService;
+import by.dmitryskachkov.flatservice.service.api.IUserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 import static org.apache.logging.log4j.util.Strings.isEmpty;
 
@@ -25,8 +29,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtTokenHandler jwtHandler;
 
-    public JwtFilter(JwtTokenHandler jwtHandler) {
+    private final IUserService userService;
+
+    public JwtFilter(JwtTokenHandler jwtHandler, IUserService userService) {
         this.jwtHandler = jwtHandler;
+        this.userService = userService;
     }
 
     @Override
@@ -41,7 +48,13 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Get jwt token and validate
+        User user = userService.getStatus(header);
+        System.out.println(user.toString());
+        if (!Objects.equals(user.getStatus(), "ACTIVATED")){
+            chain.doFilter(request, response);
+            return;
+        }
+
         final String token = header.split(" ")[1].trim();
         try {
             if (!jwtHandler.validate(token)) {

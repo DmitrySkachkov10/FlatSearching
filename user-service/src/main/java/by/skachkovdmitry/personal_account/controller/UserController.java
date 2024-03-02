@@ -3,7 +3,6 @@ package by.skachkovdmitry.personal_account.controller;
 import by.skachkovdmitry.personal_account.core.dto.User;
 import by.skachkovdmitry.personal_account.core.dto.UserLogin;
 import by.skachkovdmitry.personal_account.core.dto.UserRegistration;
-import by.skachkovdmitry.personal_account.core.dto.security.UserSecurity;
 import by.skachkovdmitry.personal_account.core.dto.verification.MailVerifyDTO;
 import by.skachkovdmitry.personal_account.core.utils.JwtTokenHandler;
 import by.skachkovdmitry.personal_account.service.api.*;
@@ -45,7 +44,7 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> getInfo() {
+    public ResponseEntity<User> getInfo() {
         return new ResponseEntity<>(authenticationService.myInfo(), HttpStatus.OK);
     }
 }

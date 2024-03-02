@@ -14,11 +14,10 @@ import java.util.UUID;
 @Table(schema = "flat", name = "flat")
 public class Flat {
 
-    @Column(name = "original_url")
-    @Id
+    @Column(name = "original_url", unique = true)
     private String originalUrl;
 
-
+    @Id
     private UUID uuid;
     @Column(name = "dt_create")
     private LocalDateTime createDate;
@@ -34,6 +33,8 @@ public class Flat {
     private float area;
     @OneToMany(mappedBy = "flat", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Photo> photos;
+
+
 
     public Flat() {
     }

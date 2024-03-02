@@ -1,5 +1,6 @@
 package by.dmitryskachkov.flatservice.controller;
 
+import by.dmitryskachkov.flatservice.controller.FlatFilterResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

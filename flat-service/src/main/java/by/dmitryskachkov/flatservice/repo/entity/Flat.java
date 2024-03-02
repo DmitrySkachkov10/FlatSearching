@@ -13,9 +13,10 @@ import java.util.UUID;
 @Table(schema = "flat", name = "flat")
 public class Flat {
 
-    @Column(name = "original_url")
-    @Id
+    @Column(name = "original_url", unique = true)
     private String originalUrl;
+
+    @Id
     private UUID uuid;
     @Column(name = "dt_create")
     private LocalDateTime createDate;
@@ -24,10 +25,9 @@ public class Flat {
     private LocalDateTime updateDate;
     @Enumerated(EnumType.STRING)
     private OfferType offerType;
-    private String description;
+    private String description; //todo sdelat`
     private int floor;
     private int bedrooms;
-
     private int price;
     private float area;
     @OneToMany(mappedBy = "flat", cascade = CascadeType.ALL, orphanRemoval = true)

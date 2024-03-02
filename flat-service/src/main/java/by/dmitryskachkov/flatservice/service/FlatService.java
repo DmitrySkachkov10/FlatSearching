@@ -25,11 +25,9 @@ public class FlatService implements IFlatService {
 
     private IFlatRepo flatRepo;
 
-    private final EntityManager entityManager;
 
     public FlatService(IFlatRepo flatRepo, EntityManager entityManager) {
         this.flatRepo = flatRepo;
-        this.entityManager = entityManager;
     }
 
     @Override
@@ -84,4 +82,6 @@ public class FlatService implements IFlatService {
                 resultPage.getTotalElements(), resultPage.isFirst(), resultPage.getNumberOfElements(),
                 resultPage.isLast(), flatDTOList);
     }
+
+
 }

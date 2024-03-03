@@ -3,11 +3,9 @@ package by.dmitryskachkov.flatservice.core.dto;
 import lombok.*;
 import java.util.List;
 
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-@EqualsAndHashCode
 public class FlatFilter {
 
     private int page;
@@ -29,5 +27,4 @@ public class FlatFilter {
     private List<Integer> floors;
 
     private boolean photo;
-
 }

@@ -25,7 +25,7 @@ public class Flat {
     private LocalDateTime updateDate;
     @Enumerated(EnumType.STRING)
     private OfferType offerType;
-    private String description; //todo sdelat`
+    private String description;
     private int floor;
     private int bedrooms;
     private int price;

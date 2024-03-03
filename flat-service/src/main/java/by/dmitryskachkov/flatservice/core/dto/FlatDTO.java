@@ -14,9 +14,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-@AllArgsConstructor
-@NoArgsConstructor
+
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class FlatDTO {
 
     private UUID uuid;

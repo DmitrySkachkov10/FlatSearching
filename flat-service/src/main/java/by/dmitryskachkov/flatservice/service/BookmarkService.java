@@ -11,6 +11,7 @@ import by.dmitryskachkov.flatservice.repo.entity.Photo;
 import by.dmitryskachkov.flatservice.service.api.IBookmarkService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,13 +50,12 @@ public class BookmarkService implements IBookmarkService {
     }
 
     @Override
-    public PageOfFlat getBookmarks() {
+    public PageOfFlat getBookmarks(Pageable pageable) {
         UserSecurity userSecurity = (UserSecurity) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
-        Page<Flat> flatPage = flatRepo.findFlatsByUserUuid(UUID.fromString(userSecurity.getUuid()), PageRequest.of(0,50));
-        //todo не указано в openApi  номера страниц и кол-во элементов!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        Page<Flat> flatPage = flatRepo.findFlatsByUserUuid(UUID.fromString(userSecurity.getUuid()), pageable);
         List<Flat> flats = flatPage.getContent();
         List<FlatDTO> flatDTOList = new ArrayList<>();
 

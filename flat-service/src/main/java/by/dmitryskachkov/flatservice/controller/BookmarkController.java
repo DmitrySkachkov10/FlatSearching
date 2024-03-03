@@ -21,8 +21,8 @@ public class BookmarkController {
     }
 
     @GetMapping()
-    public ResponseEntity<PageOfFlat> getBookmarks(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<PageOfFlat> getBookmarks(@RequestParam(defaultValue = "1") int page,
                                                    @RequestParam(defaultValue = "30") int size) {
-        return new ResponseEntity<>(bookmarkService.getBookmarks(PageRequest.of(page, size)), HttpStatus.OK);
+        return new ResponseEntity<>(bookmarkService.getBookmarks(PageRequest.of(page-1, size)), HttpStatus.OK);
     }
 }

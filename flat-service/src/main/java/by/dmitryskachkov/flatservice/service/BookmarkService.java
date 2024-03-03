@@ -10,7 +10,6 @@ import by.dmitryskachkov.flatservice.repo.entity.Flat;
 import by.dmitryskachkov.flatservice.repo.entity.Photo;
 import by.dmitryskachkov.flatservice.service.api.IBookmarkService;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;

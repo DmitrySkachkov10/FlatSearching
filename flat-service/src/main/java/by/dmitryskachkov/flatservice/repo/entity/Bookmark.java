@@ -1,17 +1,14 @@
 package by.dmitryskachkov.flatservice.repo.entity;
 
-
 import jakarta.persistence.*;
-
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(schema = "flat", name = "bookmarks")
 public class Bookmark {
 
-    @Id
     @Column(name = "user_uuid")
+    @Id
     private UUID userUuid;
 
 

@@ -14,6 +14,7 @@ import by.skachkovdmitry.personal_account.repo.entity.UserEntity;
 import by.skachkovdmitry.personal_account.service.api.IAuthenticationService;
 import by.skachkovdmitry.personal_account.service.api.IMailService;
 import by.skachkovdmitry.personal_account.service.api.IUserService;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,7 +72,7 @@ public class AuthenticationService implements IAuthenticationService {
 
         UserEntity userEntity = new UserEntity();
         userEntity.setMail(userRegistration.getMail());
-        userEntity.setPassword(userRegistration.getPassword());
+        userEntity.setPassword(BCrypt.hashpw(userRegistration.getPassword(), BCrypt.gensalt()));
         userEntity.setFio(userRegistration.getFio());
 
         userEntity.setUuid(UUID.randomUUID());
@@ -114,7 +115,6 @@ public class AuthenticationService implements IAuthenticationService {
             userService.updateUserStatus(mailVerifyEntity.getMail(), Status.ACTIVATED);
         }
 
-        //todo отдавать нормальным форматом все
     }
 
 

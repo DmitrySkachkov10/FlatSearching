@@ -7,6 +7,7 @@ import by.skachkovdmitry.personal_account.core.status.Status;
 import by.skachkovdmitry.personal_account.repo.api.IUserRepo;
 import by.skachkovdmitry.personal_account.repo.entity.UserEntity;
 import by.skachkovdmitry.personal_account.service.api.IUserService;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -54,19 +55,27 @@ public class UserService implements IUserService {
 
     @Override
     public UserEntity logIn(UserLogin userLogin) {
-        UserEntity user = userRepo.findByMailAndPassword(userLogin.getMail(), userLogin.getPassword()).orElse(null);
-        if (user != null) {
-            if (user.getStatus() != Status.WAITING_ACTIVATION) {
-                return user;
-            } else if (user.getStatus() == Status.WAITING_ACTIVATION){
-                throw new VerificationError("Пользователь не прошел верификацию");
-            } else {
-                throw new VerificationError("DEACTIVED");
-            }
+        UserEntity user = userRepo.findByMail(userLogin.getMail()).orElse(null);
 
+        if (user == null) {
+            throw new ValidationError("Запрос некорректен. Сервер не может обработать запрос");
         }
-        throw new ValidationError("Запрос некорректен. Сервер не может обработать запрос");
+
+        if (!BCrypt.checkpw(userLogin.getPassword(), user.getPassword())) {
+            throw new ValidationError("Запрос некорректен. Сервер не может обработать запрос");
+        }
+
+        if (user.getStatus() == Status.WAITING_ACTIVATION) {
+            throw new VerificationError("Пользователь не прошел верификацию");
+        }
+
+        if (user.getStatus() == Status.DEACTIVATED) {
+            throw new VerificationError("DEACTIVED");
+        }
+
+        return user;
     }
+
 
     @Override
     @Transactional

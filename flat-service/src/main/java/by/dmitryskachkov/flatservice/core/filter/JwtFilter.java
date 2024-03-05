@@ -1,16 +1,16 @@
 package by.dmitryskachkov.flatservice.core.filter;
 
-import by.dmitryskachkov.entity.Error;
 import by.dmitryskachkov.entity.TokenError;
 
 import by.dmitryskachkov.flatservice.core.dto.UserSecurity;
 import by.dmitryskachkov.flatservice.core.utils.JwtTokenHandler;
-import by.dmitryskachkov.flatservice.service.api.IFlatService;
 import by.dmitryskachkov.flatservice.service.api.IUserService;
+import feign.RetryableException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +24,7 @@ import java.util.Objects;
 
 import static org.apache.logging.log4j.util.Strings.isEmpty;
 
+@Slf4j
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -48,12 +49,24 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        User user = userService.getStatus(header);
-        System.out.println(user.toString());
-        if (!Objects.equals(user.getStatus(), "ACTIVATED")){
+        try {
+            User user = userService.getStatus(header);
+            System.out.println(user.toString());
+            if (!Objects.equals(user.getStatus(), "ACTIVATED")) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.setContentType("application/json");
+                String jsonError = "{\"error\": \"Your account is blocked. Please contact support.\"}";
+                response.getWriter().write(jsonError);
+                response.getWriter().flush();
+                return;
+            }
+        } catch (RetryableException e) {
+            log.error("нет доступа к микросервису user-service для проверки статуса");
             chain.doFilter(request, response);
             return;
         }
+
+
 
 
         final String token = header.split(" ")[1].trim();

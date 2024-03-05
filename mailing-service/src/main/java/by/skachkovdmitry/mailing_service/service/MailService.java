@@ -57,9 +57,12 @@ public class MailService implements IMailService {
         }
     }
 
-
     @Override
-    public void delete() {
-
+    public void send(String data, String mail){
+        message = new SimpleMailMessage();
+        message.setTo(mail);
+        message.setSubject("Subscribe");
+        message.setText(data);
+        javaMailSender.send(message);
     }
 }

@@ -50,7 +50,6 @@ public class SubscriptionController {
         subscriptionService.updateSubscription(subscriptionDTO, uuid, dtUpdate);
         return new ResponseEntity<>("OK", HttpStatus.OK);
     }
-
 }
 
 

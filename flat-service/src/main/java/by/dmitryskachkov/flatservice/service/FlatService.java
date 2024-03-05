@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,22 +33,7 @@ public class FlatService implements IFlatService {
 
     @Override
     public PageOfFlat getPageOfFlat(FlatFilter flatFilter) {
-        Specification<Flat> specification = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-
-            predicates.add(cb.between(root.get("price"), flatFilter.getPriceFrom(), flatFilter.getPriceTo()));
-            predicates.add(cb.between(root.get("bedrooms"), flatFilter.getBedroomsFrom(), flatFilter.getBedroomsTo()));
-            predicates.add(cb.between(root.get("area"), flatFilter.getAreaFrom(), flatFilter.getAreaTo()));
-
-            if (flatFilter.isPhoto()) {
-                predicates.add(cb.isNotEmpty(root.get("photos")));
-            }
-            if (flatFilter.getFloors() != null) {
-                predicates.add(root.get("floor").in(flatFilter.getFloors()));
-            }
-
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
+        Specification<Flat> specification = getSpecificaion(flatFilter);
 
         Pageable pageable = PageRequest.of(flatFilter.getPage(), flatFilter.getSize());
         Page<Flat> resultPage = flatRepo.findAll(specification, pageable);
@@ -84,4 +70,23 @@ public class FlatService implements IFlatService {
     }
 
 
+    private Specification<Flat> getSpecificaion(FlatFilter flatFilter){
+        Specification<Flat> specification = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            predicates.add(cb.between(root.get("price"), flatFilter.getPriceFrom(), flatFilter.getPriceTo()));
+            predicates.add(cb.between(root.get("bedrooms"), flatFilter.getBedroomsFrom(), flatFilter.getBedroomsTo()));
+            predicates.add(cb.between(root.get("area"), flatFilter.getAreaFrom(), flatFilter.getAreaTo()));
+
+            if (flatFilter.isPhoto()) {
+                predicates.add(cb.isNotEmpty(root.get("photos")));
+            }
+            if (flatFilter.getFloors() != null) {
+                predicates.add(root.get("floor").in(flatFilter.getFloors()));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+        return specification;
+    }
 }

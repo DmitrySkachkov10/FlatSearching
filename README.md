@@ -28,8 +28,6 @@ Provides the ability to add apartments to bookmarks for convenient access.
 
 Responsible for sending verification codes to email addresses during user registration.
 
-**[Docker Container with PostgreSQL, pgAdmin, and Other Microservices:](#)**
+**[Docker Compose:](https://github.com/DmitrySkachkov10/FlatSearching/blob/master/docker-compose.yml)**
 
-Used for deploying and managing the PostgreSQL database and other services in a containerized environment.
-
-These components together provide a full-featured web application for working with apartment data, with a user-friendly interface, data protection, and efficient user role management.
+Used for deploying and managing the PostgreSQL database, PgAdmin and other services in a containerized environment.

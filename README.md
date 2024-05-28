@@ -2,7 +2,7 @@
 
 A web application developed based on microservices architecture, providing convenient functionality for working with apartment data. Here is a brief description of its main components:
 
-**[Apartment Data Collection Microservice:](#)**
+**[Apartment Data Collection Microservice:](https://github.com/DmitrySkachkov10/FlatSearching/tree/master/parser-service)**
 
 This microservice automatically parses information about apartments from popular resources.
 Operates in a multi-threaded environment for efficient data collection and updates.

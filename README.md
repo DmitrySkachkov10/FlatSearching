@@ -7,24 +7,24 @@ A web application developed based on microservices architecture, providing conve
 This microservice automatically parses information about apartments from popular resources.
 Operates in a multi-threaded environment for efficient data collection and updates.
 
-**[Logging Microservice:](#)**
+**[Logging Microservice:](https://github.com/DmitrySkachkov10/FlatSearching/tree/master/audit-service)**
 
 This service is responsible for logging actions in the application.
 Administrators have access to this service for monitoring and analysis.
 It can generate Excel files with data for administrators.
 
-**[User Service Microservice:](#)**
+**[User Service Microservice:](https://github.com/DmitrySkachkov10/FlatSearching/tree/master/user-service)**
 
 This is where user registration and management of their accounts take place.
 Implements the mechanism of authentication and user role management.
 Administrators have privileged access to all services.
 
-**[Apartment Search Microservice:](#)**
+**[Apartment Search Microservice:](https://github.com/DmitrySkachkov10/FlatSearching/tree/master/flat-service)**
 
 Users can use this service to search for apartments with convenient filters.
 Provides the ability to add apartments to bookmarks for convenient access.
 
-**[Email Verification Code Sending Microservice:](#)**
+**[Email Verification Code Sending Microservice:](https://github.com/DmitrySkachkov10/FlatSearching/tree/master/mailing-service)**
 
 Responsible for sending verification codes to email addresses during user registration.
 

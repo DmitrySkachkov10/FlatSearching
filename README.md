@@ -31,3 +31,5 @@ Responsible for sending verification codes to email addresses during user regist
 **[Docker Compose:](https://github.com/DmitrySkachkov10/FlatSearching/blob/master/docker-compose.yml)**
 
 Used for deploying and managing the PostgreSQL database, PgAdmin and other services in a containerized environment.
+
+!Currently, an Nginx proxy server is also being added to route requests

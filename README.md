@@ -32,4 +32,4 @@ Responsible for sending verification codes to email addresses during user regist
 
 Used for deploying and managing the PostgreSQL database, PgAdmin and other services in a containerized environment.
 
-!Currently, an Nginx proxy server is also being added to route requests
+*Currently, an Nginx proxy server is also being added to route requests

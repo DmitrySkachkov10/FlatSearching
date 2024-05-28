@@ -1,38 +1,33 @@
-# Веб-приложение, разработанное на основе микросервисной архитектуры, предоставляет удобный функционал для работы с данными о квартирах. Вот краткое описание его основных компонентов:
+# FlatSearching: A web application developed based on microservices architecture, providing convenient functionality for working with apartment data. Here is a brief description of its main components:
 
-**Микросервис сбора данных о квартирах:**
+**Apartment Data Collection Microservice:**
 
-Данный микросервис автоматически парсит информацию о квартирах с популярных ресурсов.
-Работает в многопоточной среде для эффективного сбора и обновления данных.
+This microservice automatically parses information about apartments from popular resources.
+Operates in a multi-threaded environment for efficient data collection and updates.
 
-**Микросервис журналирования:**
+**Logging Microservice:**
 
-Этот сервис отвечает за ведение журнала действий в приложении.
-Администратор имеет доступ к этому сервису для мониторинга и анализа.
-Может генерировать Excel файлы с данными для администратора.
+This service is responsible for logging actions in the application.
+Administrators have access to this service for monitoring and analysis.
+It can generate Excel files with data for administrators.
 
-**Микросервис пользовательской службы (User Service):**
+**User Service Microservice:**
 
-Здесь происходит регистрация пользователей и управление их учетными записями.
-Реализует механизм авторизации и управления ролями пользователей.
-Администратор имеет привилегии доступа ко всем сервисам.
+This is where user registration and management of their accounts take place.
+Implements the mechanism of authentication and user role management.
+Administrators have privileged access to all services.
 
-**Микросервис поиска квартир:**
+**Apartment Search Microservice:**
 
-Пользователи могут использовать этот сервис для поиска квартир с удобными фильтрами.
-Предоставляет возможность добавления квартир в закладки для дальнейшего удобного доступа.
+Users can use this service to search for apartments with convenient filters.
+Provides the ability to add apartments to bookmarks for convenient access.
 
-**Микросервис отправки кода верификации на почту:**
+**Email Verification Code Sending Microservice:**
 
-Отвечает за отправку кодов верификации на электронную почту при регистрации пользователей.
+Responsible for sending verification codes to email addresses during user registration.
 
-**Docker контейнер с PostgreSQL, pgAdmin и остальными микросервисами:**
+**Docker Container with PostgreSQL, pgAdmin, and Other Microservices:**
 
-Используется для развертывания и управления базой данных PostgreSQL и другими сервисами в контейнеризированной среде.
+Used for deploying and managing the PostgreSQL database and other services in a containerized environment.
 
-Эти компоненты в совокупности обеспечивают полнофункциональное веб-приложение для работы с данными о квартирах, с удобным интерфейсом, защитой данных и эффективным управлением ролями пользователей.
-
-
-Используется для развертывания и управления базой данных PostgreSQL и другими сервисами в контейнеризированной среде.
-
-Эти компоненты в совокупности обеспечивают полнофункциональное веб-приложение для работы с данными о квартирах, с удобным интерфейсом, защитой данных и эффективным управлением ролями пользователей.
+These components together provide a full-featured web application for working with apartment data, with a user-friendly interface, data protection, and efficient user role management.
